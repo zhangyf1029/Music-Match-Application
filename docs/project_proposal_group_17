@@ -1,7 +1,7 @@
 PROPOSALS for group 17:
 
 Idea 1: Dating and music preferences - spotify  
-This web application will be a dating app based on music. We want to create a web application that gets a user's Spotify account to understand and analyze their music preferences. Users are matched with other users with a percentage of similar music preferences and will be able to know which song they both listen to on the same day. Once they are matched, they will have the opportunity to connect and chat with each other. The application would also suggest a first date for the match based on an API.
+This web application will be a dating app based on music. We want to create a web application that gets a user's Spotify account to understand and analyze their music preferences. Users are matched with other users with a percentage of similar music preferences. Once they are matched, the application would also suggest a first date for the match based on their preferences. We expect to use a music API and event API.
 
 Idea 2: Calendar for different events 
-This web application will generate a calendar for different events based on a user's taste and preferences. User’s select events that they would like to attend and virtual Eventbrite events are suggested in a calendar. MBTA and alternative transportation options would be reported for each event. 
+This web application will generate a calendar for different events based on a user's taste and preferences. User’s select events that they would like to attend and Eventbrite events are suggested in a calendar. Transportation options would be reported for each event. We expect to use an event API and a transportation API (such as the MBTA API so this application would be specic to Boston). 
