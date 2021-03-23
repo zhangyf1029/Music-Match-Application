@@ -1,0 +1,1 @@
+web: gunicorn cs411-flask:app
