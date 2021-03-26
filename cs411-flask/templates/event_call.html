@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Search For Music Events</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.classificationName.label }}<br>
+            {{ form.classificationName(size=32) }}
+        </p>
+      
+        <p>
+            Zipcode <br>
+            <input id="postalCode" name="postalCode" type="text" inputmode="numeric" pattern="^(?(^00000(|-0000))|(\d{5}(|-\d{4})))$">
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+{% endblock %}
+
