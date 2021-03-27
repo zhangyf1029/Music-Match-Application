@@ -3,9 +3,8 @@
 {% block content %}
     <h1>Search For Music Events</h1>
         <p>
-            {{classificationName}}<br>
-        </p>
-        <p>
-            {{postalCode}}<br>
+          {% for event in events %}
+            {{event.name}} <br>
+          {%endfor%}
         </p>
 {% endblock %}

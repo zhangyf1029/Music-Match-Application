@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import render_template, request
 from forms import EventForm
+import requests
+
 
 
 import os
@@ -16,23 +18,29 @@ def hello():
 
 @app.route('/event_call', methods=['GET', 'POST'])
 def event_call():
-    form = EventForm()
-    if request.method == 'POST':
-        classificationName = form.classificationName.data
-        postalCode = form.postalCode.data
+	form = EventForm()
+	if request.method == 'POST':
+
+		classificationName = form.classificationName.data
+		postalCode = form.postalCode.data
+
+		# params = {
+		# 	'api_key': '{PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S}',
+		# 	'classificationName': '{music}',
+		# 	'countryCode':'{US}',
+		# 	'postalCode':'{02215}'
+		# }
+		
+		#url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=02215"
+
+		response = requests.get("https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=%s" % postalCode)
+	
+		json_res = response.json()
 
 
-        url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=02215"
-
-        payload={}
-        headers = {}
-
-        response = requests.request("GET", url, headers=headers, data=payload)
-
-        print(response.text)
-        return render_template('search_results.html', classificationName=classificationName, postalCode=postalCode)
-    else:
-        return render_template('event_call.html', title='Find events', form=form)
+		return render_template('search_results.html', events = list(json_res["_embedded"]["events"]))
+	else:
+		return render_template('event_call.html', title='Find events', form=form)
 
 @app.route('/search_results', methods=['POST'])
 def search_results():
