@@ -2,9 +2,9 @@
 
 {% block content %}
     <h1>Search For Music Events</h1>
-        <p>
+        <ul>
           {% for event in events %}
-            {{event.name}} <br>
+           <li><a href =  "{{event.url}}">{{event.name}}</a></li>
           {%endfor%}
-        </p>
+        </ul>
 {% endblock %}

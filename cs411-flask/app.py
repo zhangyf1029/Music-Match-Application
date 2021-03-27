@@ -33,10 +33,9 @@ def event_call():
 		
 		#url = "https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=02215"
 
-		response = requests.get("https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=%s" % postalCode)
+		response = requests.get(f"https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode={postalCode}&classificationName={classificationName}")
 	
 		json_res = response.json()
-
 
 		return render_template('search_results.html', events = list(json_res["_embedded"]["events"]))
 	else:
