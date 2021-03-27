@@ -37,7 +37,10 @@ def event_call():
 	
 		json_res = response.json()
 
-		return render_template('search_results.html', events = list(json_res["_embedded"]["events"]))
+		if json_res["page"]["totalElements"] == 0:
+			return render_template('no_results.html')
+		else:
+			return render_template('search_results.html', events = list(json_res["_embedded"]["events"]))
 	else:
 		return render_template('event_call.html', title='Find events', form=form)
 
