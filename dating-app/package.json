@@ -16,7 +16,9 @@
     "start-api": "cd backend && venv/Scripts/flask run",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "stop": "taskkill -F -IM node.exe"
+
   },
   "eslintConfig": {
     "extends": [
