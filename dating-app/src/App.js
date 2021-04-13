@@ -1,23 +1,76 @@
-import React from 'react'; //, { useState, useEffect } from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react'; //, { useState, useEffect } from 'react';
 import './App.css';
-
 
 class SignUpForm extends React.Component {
     constructor(props){
       super(props);
-      this.state = {firstName: null, pronouns: null, preferences: null};
+      this.state = {
+        firstName: '', 
+        pronouns: '', 
+        preferences: ''};
 
       this.handleChange = this.handleChange.bind(this);
     }
   
     handleChange(event) {
-      this.setState({value: event.target.value});
+      this.setState({[event.target.name]: event.target.value});
+    }
+
+    handleSubmit(event) {
+      alert('You submitted the form');
+      // get form data out of state
+     // const { firstName, pronouns, preferences } = this.state;
+     console.log("making request")
+
+     fetch('http://localhost:5000/register', {method: "POST"})
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+    //   fetch('http://localhost:5000/callback' , {
+    //     method: "POST",
+    //     headers: {
+    //       'Content-type': 'application/json'
+    //     }
+    //    // body: JSON.stringify('')
+    //   })
+    //   .then((result) =>{
+    //     alert('You passed the info');
+    //     return result.json();
+    //   } )
+    //   .then((info) => { console.log(info); })
+
+    //   event.preventDefault();
+
+    }
+
+    onSubmit = (event) => {
+       
+      alert('You passed the info in onsubmit');
+       event.preventDefault();
+      // get form data out of state
+      const { firstName, pronouns, preferences } = this.state;
+      
+      fetch('http://localhost:5000/register' , {
+        method: "POST",
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(this.state)
+      })
+      .then((result) =>{
+        return result.json()
+      } )
+      .then((info) => { console.log(info); })
+
     }
 
     render(){
+      const { classes } = this.props;
+      const { firstName, pronouns, preferences } = this.state;
       return (
-        <form>
+
+        
+        <form onSubmit={this.handleSubmit}>
           <label> First name: 
           <input name="firstName" type="text" value={this.state.firstName} onChange={this.handleChange} />
           </label>
@@ -32,6 +85,7 @@ class SignUpForm extends React.Component {
           <input name="preferences" type="text" value={this.state.preferences} onChange={this.handleChange} />
           </label>
           <br />
+          <input type="submit" value="submit" />
 
         </form>
       );

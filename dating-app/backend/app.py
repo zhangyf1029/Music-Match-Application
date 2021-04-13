@@ -6,6 +6,8 @@ import requests
 
 app = Flask(__name__)
 
+#.\venv\Scripts\activate
+
 
 @app.route('/')
 def oauth_spotify():
@@ -30,6 +32,12 @@ def callback():
     response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
     data = response.json()
     return render_template('callback_return.html', data=data)
+
+@app.route('/register/', methods=['POST'])
+def register():
+    #response = requests.get('localhost:3000/')
+    data = request.form.get('firstName') #.json()
+    return render_template('register.html', data=data)
 
 
 

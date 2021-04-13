@@ -5,7 +5,7 @@ import SignUpForm from './App';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-    <SignUpForm />,
+    <SignUpForm/>,
   document.getElementById('root')
 );
 
