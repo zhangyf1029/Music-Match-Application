@@ -1,12 +1,31 @@
 import time 
 from flask import Flask
 from flask import render_template, request
-from startup import *
+from .startup import *
 import requests
 
 app = Flask(__name__)
 
 #.\venv\Scripts\activate
+
+# mysql = MySQL()
+# app.secret_key = 'super secret string'  # Change this!
+
+# #These will need to be changed according to your creditionals
+# app.config['MYSQL_DATABASE_USER'] = 'root'
+# app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
+# app.config['MYSQL_DATABASE_DB'] = 'photoshare'
+# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
+# mysql.init_app(app)
+
+# #begin code used for login
+# login_manager = flask_login.LoginManager()
+# login_manager.init_app(app)
+
+# conn = mysql.connect()
+# cursor = conn.cursor()
+# cursor.execute("SELECT email from Users")
+# users = cursor.fetchall()
 
 
 @app.route('/')

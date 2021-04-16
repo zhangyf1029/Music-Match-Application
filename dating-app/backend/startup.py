@@ -1,4 +1,4 @@
-from flask_spotify_auth import getAuth, refreshAuth, getToken
+from .flask_spotify_auth import getAuth, refreshAuth, getToken
 
 #Add your client ID
 CLIENT_ID = "7c1f2bab60504b6e91baaf93b7ff0c10"
