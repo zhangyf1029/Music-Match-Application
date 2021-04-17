@@ -4,7 +4,11 @@ from flask import render_template, request
 from .startup import *
 import requests
 
+from .db import get_db
+
 app = Flask(__name__)
+
+import os
 
 #.\venv\Scripts\activate
 
@@ -57,6 +61,21 @@ def register():
     #response = requests.get('localhost:3000/')
     data = request.form.get('firstName') #.json()
     return render_template('register.html', data=data)
+
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+    if request.method == "POST":
+        # if not session.get('logged_in'):
+        #     abort(401)
+        print(os.getcwd())
+        db = get_db()
+        db.execute('insert into User (first_name, pronouns, preferences) values (?, ?, ?)',
+                    ([request.form['first_name'], request.form['pronouns']], request.form['preferences']) )
+        db.commit()
+        flash('New entry was successfully posted')
+        return redirect(url_for('show_entries'), entries=entries)
+    else: 
+         return render_template('add.html')
 
 
 

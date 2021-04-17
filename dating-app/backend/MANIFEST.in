@@ -1,0 +1,2 @@
+graft backend/templates
+include backend/schema.sql

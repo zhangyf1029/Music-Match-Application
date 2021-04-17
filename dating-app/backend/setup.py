@@ -8,7 +8,7 @@ This library is used for connecting a flask application to the Spotify OAuth2 in
 from setuptools import setup
 
 setup(
-    name='flask-spotify-auth',
+    name='backend',
     version='0.1',
     url='https://github.com/vanortg/flask-spotify-auth',
     license='MIT',
@@ -16,7 +16,7 @@ setup(
     author_email='grvanort@gmail.com',
     description='Flask library for Spotify user authentication',
     long_description=__doc__,
-    py_modules=['flask_spotify_auth'],
+    py_modules=['backend'],
     zip_safe=False,
     include_package_data=True,
     install_requires=[

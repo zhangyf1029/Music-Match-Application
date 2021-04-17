@@ -22,7 +22,7 @@ class SignUpForm extends React.Component {
      // const { firstName, pronouns, preferences } = this.state;
      console.log("making request")
 
-     fetch('http://localhost:5000/register', {method: "POST"})
+     fetch('http://localhost:5000/add', {method: "POST"})
   .then(response => response.json())
   .then(data => console.log(data));
 
@@ -50,7 +50,7 @@ class SignUpForm extends React.Component {
       // get form data out of state
       const { firstName, pronouns, preferences } = this.state;
       
-      fetch('http://localhost:5000/register' , {
+      fetch('http://localhost:5000/add' , {
         method: "POST",
         headers: {
           'Content-type': 'application/json'
@@ -66,13 +66,13 @@ class SignUpForm extends React.Component {
 
     render(){
       const { classes } = this.props;
-      const { firstName, pronouns, preferences } = this.state;
+      const { first_name, pronouns, preferences } = this.state;
       return (
 
         
         <form onSubmit={this.handleSubmit}>
           <label> First name: 
-          <input name="firstName" type="text" value={this.state.firstName} onChange={this.handleChange} />
+          <input name="firstName" type="text" value={this.state.first_name} onChange={this.handleChange} />
           </label>
           <br />
 

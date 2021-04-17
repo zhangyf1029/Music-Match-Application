@@ -1,0 +1,20 @@
+Metadata-Version: 1.1
+Name: backend
+Version: 0.1
+Summary: Flask library for Spotify user authentication
+Home-page: https://github.com/vanortg/flask-spotify-auth
+Author: Gregory VanOrt
+Author-email: grvanort@gmail.com
+License: MIT
+Description: 
+        Flask-Spotify-Auth
+        ------------------
+        Greg VanOrt
+        This library is used for connecting a flask application to the Spotify OAuth2 interface.
+        
+Platform: UNKNOWN
+Classifier: Environment :: Server Environment
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python3
