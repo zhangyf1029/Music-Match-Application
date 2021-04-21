@@ -1,5 +1,5 @@
 import os
-from .app import app
+from .__init__ import app
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))

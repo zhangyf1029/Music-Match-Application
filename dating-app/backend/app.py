@@ -1,12 +1,15 @@
 import time 
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, request, redirect, url_for, flash
 from .startup import *
 import requests
 
+from werkzeug.security import generate_password_hash, check_password_hash
+from .models import User
+
 from .db import get_db
 
-app = Flask(__name__)
+from .__init__ import app 
 
 import os
 
@@ -31,8 +34,51 @@ import os
 # cursor.execute("SELECT email from Users")
 # users = cursor.fetchall()
 
-
 @app.route('/')
+def index():
+    return  render_template('index.html')
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == "GET":
+        return render_template('signup.html')
+    else: 
+        email = request.form.get('email')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        pronouns = request.form.get('pronouns')
+        preferences = request.form.get('preferences')
+        dob = request.form.get('dob')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
+
+        if user: # if a user is found, we want to redirect back to signup page so user can try again
+            flash('Email address already exists')
+            return redirect(url_for('signup'))
+
+        # create a new user with the form data. Hash the password so the plaintext version isn't saved.
+        new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
+
+        # add the new user to the database
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for('auth.login'))
+
+@app.route('/logout')
+def logout():
+    return 'Logout'
+
+@app.route('/authspotify')
 def oauth_spotify():
     data =  getUser()
     return render_template('oauth_callback.html', data=data)
@@ -67,9 +113,9 @@ def add():
     if request.method == "POST":
         # if not session.get('logged_in'):
         #     abort(401)
-        print(os.getcwd())
+        # print(os.getcwd())
         db = get_db()
-        db.execute('insert into User (first_name, pronouns, preferences) values (?, ?, ?)',
+        db.execute('INSERT INTO user (first_name, pronouns, preferences) VALUES (?, ?, ?)',
                     ([request.form['first_name'], request.form['pronouns']], request.form['preferences']) )
         db.commit()
         flash('New entry was successfully posted')
