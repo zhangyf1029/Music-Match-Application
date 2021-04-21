@@ -14,3 +14,15 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.first_name) 
+
+# class Profile_users(db.Model):
+#     id = db.Column(db.Integer, primary_key=True) # primary keys are required by SQLAlchemy
+#     email = db.Column(db.String(120), unique=True)
+#     first_name = db.Column(db.String(64), index=True, unique=True)
+#     last_name = db.Column(db.String(64), index=True, unique=True)
+#     pronouns = db.Column(db.String(64), index=True, unique=True)
+#     preferences =  db.Column(db.String(64), index=True, unique=True)
+#     password = db.Column(db.String(100))
+
+#     def __repr__(self):
+#         return '<Profile_users {}>'.format(self.first_name) 
