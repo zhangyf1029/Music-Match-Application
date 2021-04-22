@@ -5,7 +5,7 @@ from .startup import *
 import requests
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import User
+from .models import ProfileDating
 
 from .db import get_db
 
@@ -38,6 +38,40 @@ import os
 def index():
     return  render_template('index.html')
 
+@app.route('/test')
+def test():
+    email = "test2@bu.edu"
+    first_name = "test2"
+    last_name = "test3"
+    pronouns = "he/his"
+    preferences = "she/her"
+    dob = "1995-01-01"
+    password = "12345"
+
+    db = get_db()
+
+    # create a new user with the form data. Hash the password so the plaintext version isn't saved.
+    #new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
+    
+    # add the new user to the database
+    # db.execute("INSERT INTO USER VALUES(2, 'abc@bu.edu', 'abc', 'def', 'he/him', 'she/her', '1995-01-01', '12345');" )
+    #db.execute("INSERT INTO PROFILE_DATING VALUES(?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, password) )
+             
+    #db.commit()
+    #db.session.add(new_user)
+    #db.session.commit()
+
+    # for row in db.execute("SELECT * FROM USER"):
+    #     print(row)
+    # userdata = db.execute("SELECT * FROM PROFILE_DATING")
+
+    query = f" SELECT COUNT(*) FROM PROFILE_DATING where email='{email}'"
+        
+    usedEmail = db.execute(query)
+
+
+    return render_template('profile.html', data=usedEmail)
+
 @app.route('/profile')
 def profile():
     return render_template('profile.html')
@@ -59,20 +93,33 @@ def signup():
         dob = request.form.get('dob')
         password = request.form.get('password')
 
-        user = User.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
+        db = get_db()
 
-        if user: # if a user is found, we want to redirect back to signup page so user can try again
-            flash('Email address already exists')
-            return redirect(url_for('signup'))
+        query = f"SELECT email FROM PROFILE_DATING where email='{email}'"   
+        usedEmail = db.execute(query)
+        #user = ProfileDating.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
+
+        for row in usedEmail:       
+            if row: # if a user is found, we want to redirect back to signup page so user can try again
+                flash('Email address already exists')
+                return redirect(url_for('signup'))
+
+        # open connection to database
+
+        db.execute("INSERT INTO PROFILE_DATING VALUES(?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, password) )
 
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
+        #new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
 
         # add the new user to the database
-        db.session.add(new_user)
-        db.session.commit()
+        # db.session.add(new_user)
+        # db.session.commit()
+        db.commit()
 
-        return redirect(url_for('auth.login'))
+        #return redirect(url_for('auth.login'))
+        userdata = db.execute("SELECT * FROM PROFILE_DATING")
+
+        return render_template('profile.html',data = userdata) #email=usedEmail, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=password )
 
 @app.route('/logout')
 def logout():

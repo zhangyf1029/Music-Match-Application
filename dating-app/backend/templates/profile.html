@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+
 <h1 class="title">
   Welcome!
+ {% for user in data %}
+  {{user}}
+  {% endfor %}
+  <br>
+  <!-- {{email}} {{first_name}} {{last_name}} {{pronouns}} {{preferences}} {{dob}} {{password}} -->
 </h1>
 {% endblock %}

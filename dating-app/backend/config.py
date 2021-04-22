@@ -12,7 +12,7 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'backend.db'),
+    DATABASE=os.path.join(app.root_path, 'db.sqlite'),
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default'
