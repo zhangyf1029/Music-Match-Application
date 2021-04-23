@@ -158,18 +158,24 @@ def register():
 @app.route('/add', methods=['GET', 'POST'])
 def add():
     if request.method == "POST":
-        # if not session.get('logged_in'):
-        #     abort(401)
-        # print(os.getcwd())
-        db = get_db()
-        db.execute('INSERT INTO user (first_name, pronouns, preferences) VALUES (?, ?, ?)',
-                    ([request.form['first_name'], request.form['pronouns']], request.form['preferences']) )
-        db.commit()
-        flash('New entry was successfully posted')
-        return redirect(url_for('show_entries'), entries=entries)
+
+        first_name = request.form['first_name']
+        pronouns = request.form['pronouns']
+        preferences = request.form['preferences']
+        
+        return redirect(url_for('show_entries'), first_name=first_name, pronouns=pronouns, preferences=preferences)
     else: 
          return render_template('add.html')
 
+
+# if not session.get('logged_in'):
+        #     abort(401)
+        # print(os.getcwd())
+        # db = get_db()
+        # db.execute('INSERT INTO user (first_name, pronouns, preferences) VALUES (?, ?, ?)',
+                    # ([request.form['first_name'], request.form['pronouns']], request.form['preferences']) )
+        # db.commit()
+        # flash('New entry was successfully posted')
 
 
 

@@ -17,14 +17,29 @@ class SignUpForm extends React.Component {
     }
 
     handleSubmit(event) {
-      alert('You submitted the form');
+      //alert('You submitted the form');
       // get form data out of state
      // const { firstName, pronouns, preferences } = this.state;
      console.log("making request")
+     alert('You passed the info in onsubmit');
+     event.preventDefault();
+    // get form data out of state
+  //const { firstName, pronouns, preferences } = this.state;
+    
+     fetch('http://localhost:5000/add' , {
+      method: "POST",
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(this.state)
+    })
+    .then((result) =>{
+      return result.json()
+    } )
+    .then((info) => { console.log(info); })
 
-     fetch('http://localhost:5000/add', {method: "POST"})
-  .then(response => response.json())
-  .then(data => console.log(data));
+  }
+     
 
     //   fetch('http://localhost:5000/callback' , {
     //     method: "POST",
@@ -41,7 +56,7 @@ class SignUpForm extends React.Component {
 
     //   event.preventDefault();
 
-    }
+    
 
     onSubmit = (event) => {
        
