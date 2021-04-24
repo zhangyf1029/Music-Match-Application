@@ -19,7 +19,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "stop": "taskkill -F -IM node.exe"
-
   },
   "eslintConfig": {
     "extends": [
@@ -37,6 +36,6 @@
       "last 1 chrome version",
       "last 1 firefox version",
       "last 1 safari version"
-    ] 
+    ]
   }
 }
