@@ -5,7 +5,6 @@ from .startup import *
 import requests
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import ProfileDating
 
 from .db import get_db
 
@@ -65,7 +64,7 @@ def test():
     #     print(row)
     # userdata = db.execute("SELECT * FROM PROFILE_DATING")
 
-    query = f" SELECT COUNT(*) FROM PROFILE_DATING where email='{email}'"
+    query = f" SELECT * FROM dating_profile where email='susritha.kopparapu@gmail.com'"
         
     usedEmail = db.execute(query)
 
@@ -91,7 +90,9 @@ def signup():
         pronouns = request.form.get('pronouns')
         preferences = request.form.get('preferences')
         dob = request.form.get('dob')
-        password = request.form.get('password')
+        token = request.form.get('token')
+        image = request.files['image']
+        password = request.form.get('password')     
 
         db = get_db()
 
@@ -102,14 +103,13 @@ def signup():
         for row in usedEmail:       
             if row: # if a user is found, we want to redirect back to signup page so user can try again
                 flash('Email address already exists')
-                return redirect(url_for('signup'))
+                return redirect(url_for('login'))
 
         # open connection to database
 
-        db.execute("INSERT INTO PROFILE_DATING VALUES(?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, password) )
-
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        #new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
+        db.execute("INSERT INTO dating_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, image.filename, image.read(), generate_password_hash(password, method='sha256')) )
+
 
         # add the new user to the database
         # db.session.add(new_user)
@@ -117,7 +117,7 @@ def signup():
         db.commit()
 
         #return redirect(url_for('auth.login'))
-        userdata = db.execute("SELECT * FROM PROFILE_DATING")
+        userdata = db.execute("SELECT * FROM dating_profile")
 
         return render_template('profile.html',data = userdata) #email=usedEmail, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=password )
 
@@ -140,17 +140,18 @@ def callback():
     getUserToken(code)
     token = getAccessToken()
     auth_header = token[1]['Authorization']
+
     headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'Authorization': auth_header,
-}
+    }
     response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
     data = response.json()
     response_userinfo = requests.get('https://api.spotify.com/v1/me/', headers=headers)
     userinfo = response_userinfo.json()
 
-    return render_template('signup.html', data=data, userinfo=userinfo)
+    return render_template('signup.html', data=data, userinfo=userinfo, token=token)
 
 @app.route('/register/', methods=['POST'])
 def register():

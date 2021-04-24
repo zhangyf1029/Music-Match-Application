@@ -12,7 +12,7 @@
                 </div>
             {% endif %}
         {% endwith %}
-    <form method="POST" action="/signup">
+    <form method="POST" action="/signup" enctype="multipart/form-data">
             <div class="field">
                 <div class="control">
                     <input class="input is-large" type="email" name="email" value="{{userinfo.email}}" placeholder="Email" autofocus="">
@@ -34,17 +34,24 @@
 
             <div class="field">
                 <div class="control">
-                    <input class="input is-medium" type="radio+" name="pronouns" value="she/her" placeholder="she/her" autofocus="">
+                    <input class="input is-large" type="text" name="pronouns" placeholder="Pronouns" autofocus="">
+                    <!-- <input class="input is-medium" type="radio+" name="pronouns" value="she/her" placeholder="she/her" autofocus="">
                     <input class="input is-medium" type="radio+" name="pronouns" value="he/him" placeholder="he/him" autofocus="">
                     <input class="input is-medium" type="radio+" name="pronouns" value="she/they" placeholder="she/they" autofocus="">
                     <input class="input is-medium" type="radio+" name="pronouns" value="he/they" placeholder="he/they" autofocus="">
-                    <input class="input is-medium" type="radio+" name="pronouns" value="they/them" placeholder="they/them" autofocus="">
+                    <input class="input is-medium" type="radio+" name="pronouns" value="they/them" placeholder="they/them" autofocus=""> -->
                 </div>
             </div>
 
             <div class="field">
                 <div class="control">
                     <input class="input is-large" type="text" name="preferences" placeholder="Preferences" autofocus="">
+
+                    <!-- <input class="input is-medium" type="checkbox+" name="preferences" value="she/her" placeholder="she/her" autofocus="">
+                    <input class="input is-medium" type="checkbox+" name="preferences" value="he/him" placeholder="he/him" autofocus="">
+                    <input class="input is-medium" type="checkbox+" name="preferences" value="she/they" placeholder="she/they" autofocus="">
+                    <input class="input is-medium" type="checkbox+" name="preferences" value="he/they" placeholder="he/they" autofocus="">
+                    <input class="input is-medium" type="checkbox+" name="preferences" value="they/them" placeholder="they/them" autofocus="">                -->
                 </div>
             </div>
             
@@ -56,9 +63,18 @@
 
             <div class="field">
                 <div class="control">
+                    <input class="input is-large" type="file" name="image" placeholder="Image" autofocus="">
+                </div>
+            </div>
+
+            <div class="field">
+                <div class="control">
                     <input class="input is-large" type="password" name="password" placeholder="Password">
                 </div>
             </div>
+
+            <input type="hidden" name="token" value="{{token}}">
+
 
             <button class="button is-block is-info is-large is-fullwidth">Sign Up</button>
         </form>
