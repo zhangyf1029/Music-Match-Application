@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react'; //, { useState, useEffect } from 'react';
 import Header from './Components/Header'
 import HandleSubmit from './Components/HandleSubmit'
+import Navbar from './Components/Navbar/index'
+import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
+import Home from './pages'
+import About from './pages/about'
+import Contact from './pages/contact'
 
 
 const SignUpForm = () => {
@@ -39,11 +44,32 @@ const SignUpForm = () => {
     // const newTask = { id, ...task}
     // setTasks([...tasks, newTask])
   }
+
+  var background = {
+    backgroundColor : '#00d1b2',
+    color : 'black',
+    top: 0,
+    height: '100vh',
+  }
+
   return (
-    <div className="container">
-      <Header />
-      <HandleSubmit />
-    </div>
+    <html>
+      <head ></head>
+      <body style= {background}>
+        <Router>
+          <Navbar />
+          <switch>
+            <Route path ="/" exact component={Home} />
+            <Route path ="/about" component={About} />
+            <Route path ="/contact" component={Contact} />
+          </switch>
+          {/* <div className="container" style={{backgroundColor: "white"}}>
+            <Header />
+            <HandleSubmit onAdd={add}/>
+          </div> */}
+        </Router>
+    //   </body>
+    // </html>
   );
 }
 
