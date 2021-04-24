@@ -147,7 +147,10 @@ def callback():
 }
     response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
     data = response.json()
-    return render_template('callback_return.html', data=data)
+    response_userinfo = requests.get('https://api.spotify.com/v1/me/', headers=headers)
+    userinfo = response_userinfo.json()
+
+    return render_template('signup.html', data=data, userinfo=userinfo)
 
 @app.route('/register/', methods=['POST'])
 def register():

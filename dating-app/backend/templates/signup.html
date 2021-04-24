@@ -2,6 +2,7 @@
 
 {% block content %}
 <div class="column is-4 is-offset-4">
+
     <h3 class="title">Sign Up</h3>
     <div class="box">
         {% with messages = get_flashed_messages() %}
@@ -14,13 +15,13 @@
     <form method="POST" action="/signup">
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="email" name="email" placeholder="Email" autofocus="">
+                    <input class="input is-large" type="email" name="email" value="{{userinfo.email}}" placeholder="Email" autofocus="">
                 </div>
             </div>
 
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="text" name="first_name" placeholder="First Name" autofocus="">
+                    <input class="input is-large" type="text" name="first_name" value="{{userinfo.display_name}}" placeholder="First Name" autofocus="">
                 </div>
             </div>
 
@@ -33,7 +34,11 @@
 
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="text" name="pronouns" placeholder="Pronouns" autofocus="">
+                    <input class="input is-medium" type="radio+" name="pronouns" value="she/her" placeholder="she/her" autofocus="">
+                    <input class="input is-medium" type="radio+" name="pronouns" value="he/him" placeholder="he/him" autofocus="">
+                    <input class="input is-medium" type="radio+" name="pronouns" value="she/they" placeholder="she/they" autofocus="">
+                    <input class="input is-medium" type="radio+" name="pronouns" value="he/they" placeholder="he/they" autofocus="">
+                    <input class="input is-medium" type="radio+" name="pronouns" value="they/them" placeholder="they/them" autofocus="">
                 </div>
             </div>
 
