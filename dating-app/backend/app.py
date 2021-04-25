@@ -204,14 +204,12 @@ def getUserTopArtist():
     if users:
         token = users[6]
 
-        auth_header = token[0]
-
-        authorization = f'Bearer {auth_header}'      
+        authorization = f'Bearer {token}'      
 
         headers = {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': auth_header,
+        'Authorization': authorization,
         }
 
         response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
