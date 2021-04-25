@@ -1,5 +1,21 @@
 {% extends "base.html" %}
 
+<!-- <script>
+    var x = document.getElementById("demo");
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        x.innerHTML = "Geolocation is not supported by this browser.";
+      }
+    }
+    
+    function showPosition(position) {
+      x.innerHTML = "Latitude: " + position.coords.latitude +
+      "<br>Longitude: " + position.coords.longitude;
+    }
+</script> -->
+
 {% block content %}
 <div class="column is-4 is-offset-4">
 
@@ -16,43 +32,38 @@
     <form method="POST" action="/signup" enctype="multipart/form-data">
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="email" name="email" value="{{userinfo.email}}" placeholder="Email" autofocus="">
+                    <input class="input is-large" type="email" name="email" required value="{{userinfo.email}}" placeholder="Email" autofocus="">
                 </div>
             </div>
 
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="text" name="first_name" value="{{userinfo.display_name}}" placeholder="First Name" autofocus="">
+                    <input class="input is-large" type="text" name="first_name" required value="{{userinfo.display_name}}" placeholder="First Name" autofocus="">
                 </div>
             </div>
 
             <div class="field">
                 <div class="control">
-                    <input class="input is-large" type="text" name="last_name" placeholder="Last Name" autofocus="">
+                    <input class="input is-large" type="text" name="last_name" required placeholder="Last Name" autofocus="">
                 </div>
             </div>
 
 
-            <div class="field">
-                <div class="control">
-                    <input class="input is-large" type="text" name="pronouns" placeholder="Pronouns" autofocus="">
-                    <!-- <input class="input is-medium" type="radio+" name="pronouns" value="she/her" placeholder="she/her" autofocus="">
-                    <input class="input is-medium" type="radio+" name="pronouns" value="he/him" placeholder="he/him" autofocus="">
-                    <input class="input is-medium" type="radio+" name="pronouns" value="she/they" placeholder="she/they" autofocus="">
-                    <input class="input is-medium" type="radio+" name="pronouns" value="he/they" placeholder="he/they" autofocus="">
-                    <input class="input is-medium" type="radio+" name="pronouns" value="they/them" placeholder="they/them" autofocus=""> -->
-                </div>
-            </div>
+            <label for="pronouns">Pronouns</label>
+                <select name="cars" id="cars">
+                    <option value="volvo">Volvo</option>
+                    <option value="saab">Saab</option>
+                    <option value="opel">Opel</option>
+                    <option value="audi">Audi</option>
+                 </select>
+            <br><br>
 
-            <div class="field">
-                <div class="control">
-                    <input class="input is-large" type="text" name="preferences" placeholder="Preferences" autofocus="">
-
-                    <!-- <input class="input is-medium" type="checkbox+" name="preferences" value="she/her" placeholder="she/her" autofocus="">
-                    <input class="input is-medium" type="checkbox+" name="preferences" value="he/him" placeholder="he/him" autofocus="">
-                    <input class="input is-medium" type="checkbox+" name="preferences" value="she/they" placeholder="she/they" autofocus="">
-                    <input class="input is-medium" type="checkbox+" name="preferences" value="he/they" placeholder="he/they" autofocus="">
-                    <input class="input is-medium" type="checkbox+" name="preferences" value="they/them" placeholder="they/them" autofocus="">                -->
+            <div class="dropdown">
+                <button class="dropbtn">Preferences</button>
+                <div class="dropdown-content">
+                    <a href="#">He/Him</a>
+                    <a href="#">She/Her</a>
+                    <a href="#">They/Them</a>
                 </div>
             </div>
             

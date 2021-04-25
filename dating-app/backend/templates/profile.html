@@ -2,7 +2,7 @@
 
 {% block content %}
 
-
+{{data}}
 <h1 class="title">
   Welcome {{first_name}} {{last_name}}! </h1>
   <h3 class="title">
@@ -21,7 +21,6 @@
   <form action="/getMatches" method='POST'>
     <input type="hidden" name="email" value="{{email}}">
     <button class="button is-block is-info is-large is-fullwidth">See Matches</button>
-
   </form>
 
 {% endblock %}

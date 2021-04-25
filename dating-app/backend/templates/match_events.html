@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if data_self and data_other %}
+{{data_self[1]}}
+<hr>
+{{data_other[1]}}
+{% endif %}
+
+{% if data %}
+{% for x in range(3) %}
+    {{data[1][x]}}
+    <br>
+{% endfor %}
+{% endif %}
+
+
+{% if events %}
+<!-- {{events}} -->
+
+{% for event in events %}
+
+<a href =  "{{event.url}}"> {{event.name}} on {{event.dates.start.localDate}} at {{event.promoter.name}}</a> <br>
+
+{% if event.images[0] %}
+<a href =  "{{event.url}}"> </a><img src="{{event.images[0].url}}" width="200" height="200"></a> <br>
+{% endif %}
+
+{%endfor%}
+{% endif %}
+
+
+{% endblock %}

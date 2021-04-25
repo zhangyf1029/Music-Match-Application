@@ -3,7 +3,7 @@
 {% block content %}
 
 These are your top artists:<br>
-{% for artist_num in range(20) %}
+{% for artist_num in range(len) %}
 <img src="{{url[artist_num]}}" alt="{{name[artist_num]}}" width="200" height="200"><br>
 {{name[artist_num]}}
 <p>

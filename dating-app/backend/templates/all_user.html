@@ -2,20 +2,38 @@
 
 {% block content %}
 
-Here are your matches:
+<div class="column is-4 is-offset-4">
+
+{% if size!=0 %}
+<h1 class="title">Here are your matches! </h1>
+<hr>
+
+
 {% for user in all_users %}
-
-First Name: {{user[0][1]}} <br> 
-
-Match Score: {{user[3]}}%<br> 
-These are their top artists:<br>
-
+<div class="box">
+<h2>{{user[1][1]}}</h2> <br> 
+<h3>Match Score: {{user[0]}}% </h3><br> 
+These are their top 3 artists:
+<ul>
 {% for artist_num in range(3) %}
-{{user[1][artist_num]}}
-<p>
-</p>
-{% endfor %}
+<li>{{user[2][artist_num]}}</li>
 
 {% endfor %}
+</ul>
+
+<form action="/getEvents" method='POST'>
+    <input type="hidden" name="self_email" value="{{self_email}}">
+    <input type="hidden" name="other_email" value="{{user[1][0]}}">
+    <button class="button is-block is-info is-large is-fullwidth">Get Events for Us!</button>
+</form>
+
+</div>
+{% endfor %}
+
+{% else %}
+Sorry, you have no matches :(
+{% endif %}
+
+</div>
 
 {% endblock %}
