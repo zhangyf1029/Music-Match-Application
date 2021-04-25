@@ -1,5 +1,6 @@
 import time 
 from flask import Flask
+from flask import jsonify
 from flask import render_template, request, redirect, url_for, flash
 from .startup import *
 from .flask_spotify_auth import getRefreshToken, refreshAuth
@@ -93,6 +94,7 @@ def login():
 
                 return render_template('profile.html', email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
 	#information did not match
+    conn.close()
     return render_template("bad_login.html")
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -125,7 +127,7 @@ def signup():
 
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
         db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, refresh_token, generate_password_hash(password, method='sha256')) )
-
+        conn.commit()
 
         # add the new user to the database
         # db.session.add(new_user)
@@ -189,8 +191,13 @@ def getAllUsers():
 
     for user in users:
         all_users.append({'first_name':user[1], 'email':user[0]})
+    conn.close()
 
     return jsonify({'users':all_users})
+
+    # test = 'i am test user'
+    # return jsonify({'users':test})
+
     # return all_users
 
 @app.route('/getOtherUsers', methods=['GET', 'POST'])
@@ -207,6 +214,8 @@ def getOtherUsers(email):
         all_users.append({'first_name':user[1], 'email':user[0]})
 
     # return jsonify({'users':all_users})
+    conn.close()
+
     return all_users
 
 @app.route('/getUserTopArtist', methods=['POST'])
@@ -235,6 +244,7 @@ def getUserTopArtist():
             new_token_info = refreshAuth(refresh_token)
             new_access_token = new_token_info['access_token']
             cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
+            conn.commit()
             cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
             users = cursor.fetchone()
 
@@ -256,6 +266,7 @@ def getUserTopArtist():
         for artist in data:
             name.append(artist['name'])
             url.append(artist['images'][0]['url'])
+    conn.close()
 
     return render_template('top_artist.html', name=name, url=url)
 
@@ -284,6 +295,7 @@ def getTopArtist(email):
             new_token_info = refreshAuth(refresh_token)
             new_access_token = new_token_info['access_token']
             cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
+            conn.commit()
             cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
             users = cursor.fetchone()
 
@@ -305,6 +317,7 @@ def getTopArtist(email):
         for artist in data:
             name.append(artist['name'])
             url.append(artist['images'][0]['url'])
+        conn.close()
 
         return [users, name, url]
 

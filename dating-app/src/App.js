@@ -6,19 +6,22 @@ import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
 import Home from './pages'
 import About from './pages/about'
 import Contact from './pages/contact'
+import Signup from './pages/signup'
+import Users from './Components/Users'
 
 
 const SignUpForm = () => {
   const [info, setTasks] = useState([])
+  const [users, setUsers] = useState([])
 
-  // useEffect (() => {
-  //   const getTasks = async () => {
-  //     const tasksFromServer = await fetchTasks() 
-  //     setTasks(tasksFromServer)
-  //   }
+  useEffect (() => {
+    // const getTasks = async () => {
+    //   const tasksFromServer = await fetchTasks() 
+    //   setTasks(tasksFromServer)
+    fetch("/getAllUsers").then(response => response.json().then(data => {setUsers(data.users);})); 
 
   //   getTasks()
-  // }, [])
+  }, [])
 
   // const fetchTasks = async() => {
   //   const rest = await fetch ('http://localhost:5000/callback')
@@ -52,24 +55,32 @@ const SignUpForm = () => {
     height: '100vh',
   }
 
+  console.log(users);
+
   return (
+    // <div className="App">
+    //   <Users users={users} />
+    // </div>
     <html>
       <head ></head>
       <body style= {background}>
         <Router>
           <Navbar />
           <switch>
-            <Route path ="/" exact component={Home} />
+            <Route path ="/" exact component={Home}> 
+            </Route>
             <Route path ="/about" component={About} />
             <Route path ="/contact" component={Contact} />
+            <Route path ="/signup" component={Signup} />
           </switch>
           {/* <div className="container" style={{backgroundColor: "white"}}>
             <Header />
             <HandleSubmit onAdd={add}/>
           </div> */}
+
         </Router>
-    //   </body>
-    // </html>
+       </body>
+     </html>
   );
 }
 
