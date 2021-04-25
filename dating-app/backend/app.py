@@ -2,6 +2,7 @@ import time
 from flask import Flask
 from flask import render_template, request, redirect, url_for, flash
 from .startup import *
+from .flask_spotify_auth import getRefreshToken, refreshAuth
 import requests
 import sqlite3
 
@@ -90,7 +91,7 @@ def login():
                 cursor.execute("SELECT * FROM user_profile WHERE email = '{0}'".format(email))
                 user = cursor.fetchone()
 
-                return render_template('profile.html', first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+                return render_template('profile.html', email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
 	#information did not match
     return render_template("bad_login.html")
 
@@ -106,6 +107,7 @@ def signup():
         preferences = request.form.get('preferences')
         dob = request.form.get('dob')
         token = request.form.get('token')
+        refresh_token = request.form.get('refresh_token')
         #image = request.files['image']
         password = request.form.get('password')     
 
@@ -122,7 +124,7 @@ def signup():
                 return redirect(url_for('signup'))
 
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, generate_password_hash(password, method='sha256')) )
+        db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, refresh_token, generate_password_hash(password, method='sha256')) )
 
 
         # add the new user to the database
@@ -130,10 +132,7 @@ def signup():
         # db.session.commit()
         db.commit()
 
-        #return redirect(url_for('auth.login'))
-        userdata = db.execute("SELECT * FROM user_profile")
-
-        return render_template('profile.html',data = userdata) #email=usedEmail, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=password )
+        return render_template('profile.html', email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob)
 
 @app.route('/logout')
 def logout():
@@ -149,6 +148,9 @@ def callback():
     code = request.args.get('code', default = '', type=str)
     getUserToken(code)
     token = getAccessToken()
+    # refreshAuth()
+    refresh_token = token[3]
+    token = token[:3]
     auth_header = token[1]['Authorization']
 
     headers = {
@@ -173,7 +175,7 @@ def callback():
         if row: # if a user is found, we want to redirect back to signup page so user can try again
             flash('Email address already exists')
 
-    return render_template('signup.html', data=data, userinfo=userinfo, token=token)
+    return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
 
 @app.route('/users', methods=['GET', 'POST'])
 def users():
@@ -189,8 +191,36 @@ def users():
             all_users.append({'first_name':user.first_name, 'last_name':user.last_name})
 
         return jsonify({'users':all_users})
-        
 
 
+@app.route('/getUserTopArtist', methods=['POST'])
+def getUserTopArtist():
+    email = request.form.get('email')
+    conn = sqlite3.connect('db.sqlite')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
+    users = cursor.fetchone()
+
+    if users:
+        token = users[6]
+
+        auth_header = token[0]
+
+        authorization = f'Bearer {auth_header}'      
+
+        headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': auth_header,
+        }
+
+        response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
+        data = response.json()
+
+
+    return render_template('top_artist.html', data=data)
+
+
+    
 if __name__ == '__main__':
     app.run()

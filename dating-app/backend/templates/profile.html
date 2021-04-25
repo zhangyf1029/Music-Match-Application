@@ -12,4 +12,10 @@
   <br>
   Birthday: {{dob}}
 
+  <form action="/getUserTopArtist" method='POST'>
+    <input type="hidden" name="email" value="{{email}}">
+    <button class="button is-block is-info is-large is-fullwidth">See Top Artist</button>
+
+  </form>
+
 {% endblock %}
