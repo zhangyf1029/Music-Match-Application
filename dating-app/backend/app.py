@@ -94,24 +94,6 @@ def login():
 	#information did not match
     return render_template("bad_login.html")
 
-
-# @app.route('/login', methods=['POST'])
-# def login():
-#     email = request.form.get('email')
-#     password = request.form.get('password')
-#     remember = True if request.form.get('remember') else False
-
-#     user = UserProfile.query.filter_by(email=email).first()
-
-#     # check if the user actually exists
-#     # take the user-supplied password, hash it, and compare it to the hashed password in the database
-#     if not user or not check_password_hash(user.password, password):
-#         flash('Please check your login details and try again.')
-#         return redirect(url_for('login')) # if the user doesn't exist or password is wrong, reload the page
-
-#     # if the above check passes, then we know the user has the right credentials
-#     return redirect(url_for('profile'))
-
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == "GET":
@@ -162,10 +144,6 @@ def oauth_spotify():
     data =  getUser()
     return render_template('oauth_callback.html', data=data)
 
-@app.route('/time')
-def get_current_time():
-    return {'time': time.time()}
-
 @app.route('/callback/')
 def callback():
     code = request.args.get('code', default = '', type=str)
@@ -197,41 +175,21 @@ def callback():
 
     return render_template('signup.html', data=data, userinfo=userinfo, token=token)
 
-@app.route('/register/', methods=['POST'])
-def register():
-    #response = requests.get('localhost:3000/')
-    data = request.form.get('firstName') #.json()
-    return render_template('register.html', data=data)
+@app.route('/users', methods=['GET', 'POST'])
+def users():
+    if request.method == "GET":
+        conn = sqlite3.connect('db.sqlite')
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM user_profile")
+        users = cursor.fetchall()
 
-@app.route('/add', methods=['GET', 'POST'])
-def add():
-    if request.method == "POST":
+        all_users = []
 
-        first_name = request.form['first_name']
-        pronouns = request.form['pronouns']
-        preferences = request.form['preferences']
+        for user in users:
+            all_users.append({'first_name':user.first_name, 'last_name':user.last_name})
+
+        return jsonify({'users':all_users})
         
-        return redirect(url_for('show_entries'), first_name=first_name, pronouns=pronouns, preferences=preferences)
-    else: 
-         return render_template('add.html')
-
-
-# if not session.get('logged_in'):
-        #     abort(401)
-        # print(os.getcwd())
-        # db = get_db()
-        # db.execute('INSERT INTO user (first_name, pronouns, preferences) VALUES (?, ?, ?)',
-                    # ([request.form['first_name'], request.form['pronouns']], request.form['preferences']) )
-        # db.commit()
-        # flash('New entry was successfully posted')
-
-
-
-
-
-
-        
-
 
 
 if __name__ == '__main__':
