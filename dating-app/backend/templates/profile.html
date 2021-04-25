@@ -4,11 +4,12 @@
 
 
 <h1 class="title">
-  Welcome!
- {% for user in data %}
-  {{user}}
-  {% endfor %}
+  Welcome {{first_name}} {{last_name}}! </h1>
+  <h3 class="title">
+ ({{pronouns}}) </h3>
   <br>
-  <!-- {{email}} {{first_name}} {{last_name}} {{pronouns}} {{preferences}} {{dob}} {{password}} -->
-</h1>
+  Noted preferences in a match: {{preferences}}
+  <br>
+  Birthday: {{dob}}
+
 {% endblock %}

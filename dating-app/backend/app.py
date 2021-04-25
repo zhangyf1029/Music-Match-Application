@@ -3,9 +3,9 @@ from flask import Flask
 from flask import render_template, request, redirect, url_for, flash
 from .startup import *
 import requests
+import sqlite3
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from .models import ProfileDating
 
 from .db import get_db
 
@@ -50,25 +50,9 @@ def test():
 
     db = get_db()
 
-    # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-    #new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
-    
-    # add the new user to the database
-    # db.execute("INSERT INTO USER VALUES(2, 'abc@bu.edu', 'abc', 'def', 'he/him', 'she/her', '1995-01-01', '12345');" )
-    #db.execute("INSERT INTO PROFILE_DATING VALUES(?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, password) )
-             
-    #db.commit()
-    #db.session.add(new_user)
-    #db.session.commit()
-
-    # for row in db.execute("SELECT * FROM USER"):
-    #     print(row)
-    # userdata = db.execute("SELECT * FROM PROFILE_DATING")
-
-    query = f" SELECT COUNT(*) FROM PROFILE_DATING where email='{email}'"
+    query = f" SELECT * FROM user_profile where email='susritha.kopparapu@gmail.com'"
         
     usedEmail = db.execute(query)
-
 
     return render_template('profile.html', data=usedEmail)
 
@@ -76,9 +60,57 @@ def test():
 def profile():
     return render_template('profile.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == "GET":
+        return render_template('login.html')
+    else:
+        email = request.form.get('email')
+        conn = sqlite3.connect('db.sqlite')
+        cursor = conn.cursor()
+
+        # db = get_db()
+        # query = f"SELECT email FROM user_profile WHERE email='{email}'"
+        # in_database = db.execute(query)
+        # if in_database:
+        if cursor.execute("SELECT password FROM user_profile WHERE email = '{0}'".format(email)):
+            data = cursor.fetchall()
+
+            hash_pwd = str(data[0][0] )
+            
+            # pwd = str(in_database.password)
+
+            password = request.form.get('password')
+            if check_password_hash(hash_pwd, password):
+                # user = User()
+                # user.id = email
+                # flask_login.login_user(user) #okay login in user
+                # return flask.redirect(flask.url_for('protected')) #protected is a function
+
+                cursor.execute("SELECT * FROM user_profile WHERE email = '{0}'".format(email))
+                user = cursor.fetchone()
+
+                return render_template('profile.html', first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+	#information did not match
+    return render_template("bad_login.html")
+
+
+# @app.route('/login', methods=['POST'])
+# def login():
+#     email = request.form.get('email')
+#     password = request.form.get('password')
+#     remember = True if request.form.get('remember') else False
+
+#     user = UserProfile.query.filter_by(email=email).first()
+
+#     # check if the user actually exists
+#     # take the user-supplied password, hash it, and compare it to the hashed password in the database
+#     if not user or not check_password_hash(user.password, password):
+#         flash('Please check your login details and try again.')
+#         return redirect(url_for('login')) # if the user doesn't exist or password is wrong, reload the page
+
+#     # if the above check passes, then we know the user has the right credentials
+#     return redirect(url_for('profile'))
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -91,11 +123,14 @@ def signup():
         pronouns = request.form.get('pronouns')
         preferences = request.form.get('preferences')
         dob = request.form.get('dob')
-        password = request.form.get('password')
+        token = request.form.get('token')
+        #image = request.files['image']
+        password = request.form.get('password')     
 
+        # open connection to database
         db = get_db()
 
-        query = f"SELECT email FROM PROFILE_DATING where email='{email}'"   
+        query = f"SELECT email FROM user_profile where email='{email}'"   
         usedEmail = db.execute(query)
         #user = ProfileDating.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
 
@@ -104,12 +139,9 @@ def signup():
                 flash('Email address already exists')
                 return redirect(url_for('signup'))
 
-        # open connection to database
-
-        db.execute("INSERT INTO PROFILE_DATING VALUES(?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, password) )
-
         # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        #new_user = User(email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=generate_password_hash(password, method='sha256'))
+        db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, generate_password_hash(password, method='sha256')) )
+
 
         # add the new user to the database
         # db.session.add(new_user)
@@ -117,7 +149,7 @@ def signup():
         db.commit()
 
         #return redirect(url_for('auth.login'))
-        userdata = db.execute("SELECT * FROM PROFILE_DATING")
+        userdata = db.execute("SELECT * FROM user_profile")
 
         return render_template('profile.html',data = userdata) #email=usedEmail, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob, password=password )
 
@@ -140,17 +172,30 @@ def callback():
     getUserToken(code)
     token = getAccessToken()
     auth_header = token[1]['Authorization']
+
     headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'Authorization': auth_header,
-}
+    }
+
     response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
     data = response.json()
     response_userinfo = requests.get('https://api.spotify.com/v1/me/', headers=headers)
     userinfo = response_userinfo.json()
 
-    return render_template('signup.html', data=data, userinfo=userinfo)
+    # open connection to database
+    db = get_db()
+
+    query = f"SELECT email FROM user_profile where email='{userinfo['email']}'"   
+    usedEmail = db.execute(query)
+    #user = ProfileDating.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
+
+    for row in usedEmail:       
+        if row: # if a user is found, we want to redirect back to signup page so user can try again
+            flash('Email address already exists')
+
+    return render_template('signup.html', data=data, userinfo=userinfo, token=token)
 
 @app.route('/register/', methods=['POST'])
 def register():

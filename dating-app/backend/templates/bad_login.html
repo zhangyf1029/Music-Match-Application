@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="column is-4 is-offset-4">
+<div class="box">
+<form method="GET" action="/login">
+    <button class="button is-block is-info is-large is-fullwidth">Try Again!</button>
+</form>
+</div>
+</div>
+
+<p></p>
+
+<div class="column is-4 is-offset-4">
+<div class="box">
+<form method="GET" action="/">
+    <button class="button is-block is-info is-large is-fullwidth">Make an Account!</button>
+</form>
+</div>
+</div>
+
+{% endblock %}
