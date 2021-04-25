@@ -190,8 +190,8 @@ def getAllUsers():
     for user in users:
         all_users.append({'first_name':user[1], 'email':user[0]})
 
-    # return jsonify({'users':all_users})
-    return all_users
+    return jsonify({'users':all_users})
+    # return all_users
 
 @app.route('/getOtherUsers', methods=['GET', 'POST'])
 def getOtherUsers(email):
