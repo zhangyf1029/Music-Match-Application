@@ -203,6 +203,7 @@ def getUserTopArtist():
 
     if users:
         token = users[6]
+        refresh_token = users[7]
 
         authorization = f'Bearer {token}'      
 
@@ -214,9 +215,36 @@ def getUserTopArtist():
 
         response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
         data = response.json()
+        if 'error' in data.keys():
+            new_token_info = refreshAuth(refresh_token)
+            new_access_token = new_token_info['access_token']
+            cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
+            cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
+            users = cursor.fetchone()
+
+        
+            authorization = f'Bearer {new_access_token}'      
+
+            headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': authorization,
+            }
+
+            response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
+            data = response.json()
+
+        data = data['items']
+        name = []
+        url = []
+
+        for artist in data:
+            name.append(artist['name'])
+            url.append(artist['images'][0]['url'])
 
 
-    return render_template('top_artist.html', data=data)
+
+    return render_template('top_artist.html', name=name, url=url)
 
 
     

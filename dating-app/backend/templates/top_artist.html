@@ -1,7 +1,15 @@
+{% extends "base.html" %}
 
+{% block content %}
 
-{{data}}
-
-<p></p>
+These are your top artists:<br>
+{% for artist_num in range(20) %}
+<img src="{{url[artist_num]}}" alt="{{name[artist_num]}}" width="200" height="200"><br>
+{{name[artist_num]}}
+<p>
+</p>
+{% endfor %}
 
 <!-- ['BQAtrWQGMIIC5X9wbfJPlTU6TWTXtVupPkk43oxV_00ZBg6ehqq_MJJYfg94gE_OLX4qGBYTqZHOK7tY_kmm6IjpQqmo8K4OU8fXr_GJeN7rPS-_YPP9UiFSzE-AEwz4IKPyRYR5YAwsl1EAzxx-jd-4krCAoxSXC_LtueToTB6n', {'Authorization': 'Bearer BQAtrWQGMIIC5X9wbfJPlTU6TWTXtVupPkk43oxV_00ZBg6ehqq_MJJYfg94gE_OLX4qGBYTqZHOK7tY_kmm6IjpQqmo8K4OU8fXr_GJeN7rPS-_YPP9UiFSzE-AEwz4IKPyRYR5YAwsl1EAzxx-jd-4krCAoxSXC_LtueToTB6n'}, 'user-read-email user-top-read', 3600] -->
+
+{% endblock %}

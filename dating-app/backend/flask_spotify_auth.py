@@ -39,10 +39,10 @@ def handleToken(response):
     return [response["access_token"], auth_head, response["scope"], response["expires_in"], response['refresh_token']]
 
 #third call
-def refreshAuth():
+def refreshAuth(refresh_token):
     body = {
         "grant_type" : "refresh_token",
-        "refresh_token" : REFRESH_TOKEN
+        "refresh_token" : refresh_token
     }
 
     auth_str = bytes('{}:{}'.format(CLIENT_ID, CLIENT_SECRET), 'utf-8')
@@ -50,9 +50,9 @@ def refreshAuth():
     headers = {"Content-Type" : HEADER, "Authorization" : "Basic {}".format(encoded)} 
 
     post_refresh = requests.post(SPOTIFY_URL_TOKEN, data=body, headers=headers)
-    p_back = json.dumps(post_refresh.text)
+    p_back = json.loads(post_refresh.text)
     
-    return handleToken(p_back)
+    return p_back #handleToken(p_back)
 
 def getRefreshToken():
     return REFRESH_TOKEN
