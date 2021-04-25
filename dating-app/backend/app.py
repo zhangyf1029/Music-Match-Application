@@ -149,8 +149,8 @@ def callback():
     getUserToken(code)
     token = getAccessToken()
     # refreshAuth()
-    refresh_token = token[3]
-    token = token[:3]
+    refresh_token = token[4]
+    token = token[:4]
     auth_header = token[1]['Authorization']
 
     headers = {
