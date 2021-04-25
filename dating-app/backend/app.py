@@ -177,21 +177,37 @@ def callback():
 
     return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
 
-@app.route('/users', methods=['GET', 'POST'])
-def users():
-    if request.method == "GET":
-        conn = sqlite3.connect('db.sqlite')
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM user_profile")
-        users = cursor.fetchall()
+@app.route('/getAllUsers', methods=['GET', 'POST'])
+def getAllUsers():
+    # if request.method == "GET":
+    conn = sqlite3.connect('db.sqlite')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM user_profile")
+    users = cursor.fetchall()
 
-        all_users = []
+    all_users = []
 
-        for user in users:
-            all_users.append({'first_name':user.first_name, 'last_name':user.last_name})
+    for user in users:
+        all_users.append({'first_name':user[1], 'email':user[0]})
 
-        return jsonify({'users':all_users})
+    # return jsonify({'users':all_users})
+    return all_users
 
+@app.route('/getOtherUsers', methods=['GET', 'POST'])
+def getOtherUsers(email):
+    # if request.method == "GET":
+    conn = sqlite3.connect('db.sqlite')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM user_profile WHERE NOT email='{0}'".format(email))
+    users = cursor.fetchall()
+
+    all_users = []
+
+    for user in users:
+        all_users.append({'first_name':user[1], 'email':user[0]})
+
+    # return jsonify({'users':all_users})
+    return all_users
 
 @app.route('/getUserTopArtist', methods=['POST'])
 def getUserTopArtist():
@@ -222,7 +238,6 @@ def getUserTopArtist():
             cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
             users = cursor.fetchone()
 
-        
             authorization = f'Bearer {new_access_token}'      
 
             headers = {
@@ -242,10 +257,88 @@ def getUserTopArtist():
             name.append(artist['name'])
             url.append(artist['images'][0]['url'])
 
-
-
     return render_template('top_artist.html', name=name, url=url)
 
+@app.route('/getTopArtist', methods=['POST'])
+def getTopArtist(email):
+    conn = sqlite3.connect('db.sqlite')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
+    users = cursor.fetchone()
+
+    if users:
+        token = users[6]
+        refresh_token = users[7]
+
+        authorization = f'Bearer {token}'      
+
+        headers = {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': authorization,
+        }
+
+        response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
+        data = response.json()
+        if 'error' in data.keys():
+            new_token_info = refreshAuth(refresh_token)
+            new_access_token = new_token_info['access_token']
+            cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
+            cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
+            users = cursor.fetchone()
+
+            authorization = f'Bearer {new_access_token}'      
+
+            headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': authorization,
+            }
+
+            response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
+            data = response.json()
+
+        data = data['items']
+        name = []
+        url = []
+
+        for artist in data:
+            name.append(artist['name'])
+            url.append(artist['images'][0]['url'])
+
+        return [users, name, url]
+
+@app.route('/getMatchPercent', methods=['GET', 'POST'])
+def getMatchPercent(self_email, other_email):
+    self_top = getTopArtist(self_email) #returns [users, name, url]
+    other_top = getTopArtist(other_email) #returns [users, name, url]
+    match_count = 0
+    #self_top[1] is names of top artists
+    for self_top_artist in self_top[1]: #self top artist is each top artist of self
+         #other[1] is names of top artists
+         if self_top_artist in other_top[1]:
+             match_count+= 1
+    return (match_count / 20) * 100
+
+
+
+
+
+
+@app.route('/getMatches', methods=['GET', 'POST'])
+def getMatches():
+    if request.method == 'POST':
+        self_email = request.form.get('email')
+        other_users = getOtherUsers(self_email)
+        all_users_top = []
+        for user in other_users:
+            other_email = user['email']
+            user_top = getTopArtist(other_email)  #returns [users, name, url]
+            match_percent = getMatchPercent(self_email, other_email)
+            user_top.append(match_percent)
+            all_users_top.append(user_top)
+    
+        return render_template("all_user.html", all_users=all_users_top)
 
     
 if __name__ == '__main__':
