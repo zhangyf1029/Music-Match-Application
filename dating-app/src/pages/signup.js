@@ -3,45 +3,85 @@ import {useState, useEffect } from 'react'
 import {Nav,NavLink,Bars,NavMenu,NavBtn,NavBtnLink} from '../Components/Navbar/NavbarElements'
 // export const Users = ({ users }) => { return (<div>{movies.length}</div> ) }
 
-const Signup = () => {
-  const [showAddTask, setShowAddTask] = useState (false)
-  const [info, setTasks] = useState([])
-  useEffect (() => {
-    const getTasks = async () => {
-      const tasksFromServer = await fetchTasks() 
-      setTasks(tasksFromServer)
-    }
-    getTasks()
-  }, [])
+// const Signup = () => {
+//   const [showAddTask, setShowAddTask] = useState (false)
+//   const [info, setTasks] = useState([])
+//   useEffect (() => {
+//     const getTasks = async () => {
+//       const tasksFromServer = await fetchTasks() 
+//       setTasks(tasksFromServer)
+//     }
+//     getTasks()
+//   }, [])
 
-  const fetchTasks = async() => {
-    const rest = await fetch ('http://localhost:5000/authspotify')
-    const data = await rest.text()
+//   const fetchTasks = async() => {
+//     const rest = await fetch ('http://localhost:5000/authspotify')
+//     const data = await rest.text()
   
-    return data
-  }
+//     return data
+//   }
 
-  const add = async(task) => {
-    const res = await fetch('http://localhost:5000/add', {
-      method: 'POST',
-      headers: {
-      'Content-type': 'application/json'
-      },
-      body: JSON.stringify(task)
-    })
+//   const add = async(task) => {
+//     const res = await fetch('http://localhost:5000/add', {
+//       method: 'POST',
+//       headers: {
+//       'Content-type': 'application/json'
+//       },
+//       body: JSON.stringify(task)
+//     })
 
-    const data = await  res.json()
-    setTasks([...info, data])
+//     const data = await  res.json()
+//     setTasks([...info, data])
 
 
     // const id = Math.floor(Math.random() * 10000) + 1 
     // const newTask = { id, ...task}
     // setTasks([...tasks, newTask])
-  }
-  return (
-    <div className="container">
-        <button onClick={async () => {await fetchTasks("Example");}}>Sign Up</button>
-    </div>
+
+    class SignUp extends React.Component {
+      constructor(props){
+      super(props);
+      this.state = {
+        url: ''
+      };
+      this.handleSubmit = this.handleSubmit.bind(this);
+      }
+
+      handleSubmit(event){ 
+        let data;
+        let temp; 
+        event.preventDefault();
+        console.log('button clicked');
+        fetch('http://localhost:5000/authspotify', {
+         method: 'get',
+        })
+        .then( (response) => response.json()
+        )
+        .then( (data) => console.log(data.data))
+      }
+    // const res = await fetch('http://localhost:5000/authspotify' , {
+    //   method: "POST",
+    //   headers: {
+    //     'Content-type': 'application/json'
+    //   },
+    //   body: JSON.stringify(this.state)
+    // })
+    // const data = await  res.json()
+
+    // setTasks([...tasks, data])
+    // .then((result) =>{
+    //   return result.json()
+    // } )
+    // .then((info) => { console.log(info); })
+
+    render(){  return (
+      <div class="column is-4 is-offset-4">
+
+       <form onSubmit={this.handleSubmit}>
+        {/* <button onClick={async () => {await fetchTasks();}}>Sign Up</button> */}
+        <button class="button is-block is-info is-large is-fullwidth">Sign Up With Spotify</button>
+        </form> 
+        </div>
     // <html>
     //   <head>
     //     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
@@ -70,6 +110,7 @@ const Signup = () => {
     //   </body>
     // </html>
   );
-};
-
-export default Signup;
+}
+    };
+  
+  export default SignUp;

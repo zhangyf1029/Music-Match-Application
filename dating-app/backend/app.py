@@ -26,12 +26,15 @@ def test():
     pass 
 
 @app.route('/authspotify')
-def oauth_spotify():
+def authspotify():
     ''' /authspotify uses the getUser which calls getAuth
         together it puts together a url that is used 
         to make the first api call  '''
     data =  getUser()
-    return render_template('oauth_callback.html', data=data)
+
+    # return redirect(data)
+    return jsonify({'data': data})
+    # return render_template('oauth_callback.html', data=data)
 
 @app.route('/callback/')
 def callback():
@@ -42,6 +45,8 @@ def callback():
         the second api call. Then we can get the token, set up headers
         and make third api call to get top artist info and user 
         info and check to make sure email is not used already and return'''
+
+    # store A_token, r_token, email, display_name  cookie 
 
     #retreive str argument from code and supply it to getUserToken     
     code = request.args.get('code', default = '', type=str)
@@ -85,6 +90,8 @@ def callback():
     #close db connection and return json         
     close_db()
 
+    #return cookie here 
+
     return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
     # return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
 
@@ -111,9 +118,11 @@ def signup():
         pronouns = request.form.get('pronouns')
         preferences = request.form.get('preferences')
         dob = request.form.get('dob')
+        password = request.form.get('password')     
+
+        # retrieve from cookie 
         token = request.form.get('token')
         refresh_token = request.form.get('refresh_token')
-        password = request.form.get('password')     
 
         # open connection to database
         db = get_db()
@@ -184,6 +193,10 @@ def login():
     #if we reach here the password or email did not match, so close the connection and render bad_login
     conn.close()
     return render_template("bad_login.html")
+
+@app.route('/getUserInfo')
+def getUserInfo():
+    pass
 
 @app.route('/profile')
 def profile():
