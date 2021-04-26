@@ -7,6 +7,7 @@ import Home from './pages'
 import About from './pages/about'
 import Contact from './pages/contact'
 import Signup from './pages/signup'
+import Start from './pages/start'
 import Users from './Components/Users'
 
 
@@ -30,23 +31,23 @@ const SignUpForm = () => {
   //   return data
   // }
 
-  const add = async(task) => {
-    const res = await fetch('http://localhost:5000/add', {
-      method: 'POST',
-      headers: {
-      'Content-type': 'application/json'
-      },
-      body: JSON.stringify(task)
-    })
+  // const add = async(task) => {
+  //   const res = await fetch('http://localhost:5000/add', {
+  //     method: 'POST',
+  //     headers: {
+  //     'Content-type': 'application/json'
+  //     },
+  //     body: JSON.stringify(task)
+  //   })
 
-    const data = await  res.json()
-    setTasks([...info, data])
+  //   const data = await  res.json()
+  //   setTasks([...info, data])
 
 
-    // const id = Math.floor(Math.random() * 10000) + 1 
-    // const newTask = { id, ...task}
-    // setTasks([...tasks, newTask])
-  }
+  //   // const id = Math.floor(Math.random() * 10000) + 1 
+  //   // const newTask = { id, ...task}
+  //   // setTasks([...tasks, newTask])
+  // }
 
   var background = {
     backgroundColor : '#00d1b2',
@@ -59,17 +60,23 @@ const SignUpForm = () => {
 
   return (
     // <div className="App">
-    //   <Users users={users} />
+    //   <Users users={users.map(users => <div>{users.email} <div>{users.first_name}</div> </div> )} />
     // </div>
     <html>
-      <head ></head>
+      <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+        {/* <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" 
+        rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous" />
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" 
+        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script> */}
+      </head>
       <body style= {background}>
         <Router>
           <Navbar />
           <switch>
-            <Route path ="/" exact component={Home}> 
-            </Route>
+            <Route path ="/" exact component={Home}/>
             <Route path ="/about" component={About} />
+            <Route path ="/start" component={Start} />
             <Route path ="/contact" component={Contact} />
             <Route path ="/signup" component={Signup} />
           </switch>
@@ -127,20 +134,20 @@ export default SignUpForm;
 //   }
      
 
-//     //   fetch('http://localhost:5000/callback' , {
-//     //     method: "POST",
-//     //     headers: {
-//     //       'Content-type': 'application/json'
-//     //     }
-//     //    // body: JSON.stringify('')
-//     //   })
-//     //   .then((result) =>{
-//     //     alert('You passed the info');
-//     //     return result.json();
-//     //   } )
-//     //   .then((info) => { console.log(info); })
+    //   fetch('http://localhost:5000/callback' , {
+    //     method: "POST",
+    //     headers: {
+    //       'Content-type': 'application/json'
+    //     }
+    //    // body: JSON.stringify('')
+    //   })
+    //   .then((result) =>{
+    //     alert('You passed the info');
+    //     return result.json();
+    //   } )
+    //   .then((info) => { console.log(info); })
 
-//     //   event.preventDefault();
+    //   event.preventDefault();
 
     
 

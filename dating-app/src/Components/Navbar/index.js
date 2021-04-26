@@ -12,7 +12,7 @@ const Navbar = () => {
                     <NavLink to = "/about" activeStyle>
                         About
                     </NavLink>
-                    <NavLink to = "/match" activeStyle>
+                    <NavLink to = "/start" activeStyle>
                         Start Matching
                     </NavLink>
                     <NavLink to = "/contact" activeStyle>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const About = () => {
+const Start = () => {
   return (
     <html>
       <head>
@@ -34,4 +34,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default Start;

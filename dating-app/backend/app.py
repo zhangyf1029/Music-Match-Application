@@ -61,7 +61,9 @@ def callback():
         if row: # if a user is found, we want to redirect back to signup page so user can try again
             flash('Email address already exists')
 
-    return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
+    return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
+
+    # return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
