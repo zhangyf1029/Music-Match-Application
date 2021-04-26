@@ -1,149 +1,31 @@
-import time 
-from flask import Flask
-from flask import jsonify
-from flask import render_template, request, redirect, url_for, flash
-from .startup import *
-from .flask_spotify_auth import getRefreshToken, refreshAuth
-import requests
-import sqlite3
-
-import itertools, operator 
-from collections import Counter
-
+import time, requests, sqlite3, itertools, operator, os
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from .startup import *
+from .flask_spotify_auth import getRefreshToken, refreshAuth
 from .db import get_db
-
 from .__init__ import app 
 
-import os
 
+# VIRTUAL ENVIRONMENT RUN CMD FOR WINDOWS
 #.\venv\Scripts\activate
-
-# mysql = MySQL()
-# app.secret_key = 'super secret string'  # Change this!
-
-# #These will need to be changed according to your creditionals
-# app.config['MYSQL_DATABASE_USER'] = 'root'
-# app.config['MYSQL_DATABASE_PASSWORD'] = 'password'
-# app.config['MYSQL_DATABASE_DB'] = 'photoshare'
-# app.config['MYSQL_DATABASE_HOST'] = 'localhost'
-# mysql.init_app(app)
-
-# #begin code used for login
-# login_manager = flask_login.LoginManager()
-# login_manager.init_app(app)
-
-# conn = mysql.connect()
-# cursor = conn.cursor()
-# cursor.execute("SELECT email from Users")
-# users = cursor.fetchall()
 
 @app.route('/')
 def index():
+    ''' Empty path for index.html that has about info 
+        and sign up with spotify button. Will redirect
+        to /authspotify '''
     return  render_template('index.html')
 
 @app.route('/test')
 def test():
-    email = "test2@bu.edu"
-    first_name = "test2"
-    last_name = "test3"
-    pronouns = "he/his"
-    preferences = "she/her"
-    dob = "1995-01-01"
-    password = "12345"
-
-    db = get_db()
-
-    query = f" SELECT * FROM user_profile where email='susritha.kopparapu@gmail.com'"
-        
-    usedEmail = db.execute(query)
-
-    return render_template('profile.html', data=usedEmail)
-
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == "GET":
-        return render_template('login.html')
-    else:
-        email = request.form.get('email')
-        conn = sqlite3.connect('db.sqlite')
-        cursor = conn.cursor()
-
-        # db = get_db()
-        # query = f"SELECT email FROM user_profile WHERE email='{email}'"
-        # in_database = db.execute(query)
-        # if in_database:
-        if cursor.execute("SELECT password FROM user_profile WHERE email = '{0}'".format(email)):
-            data = cursor.fetchall()
-
-            hash_pwd = str(data[0][0] )
-            
-            # pwd = str(in_database.password)
-
-            password = request.form.get('password')
-            if check_password_hash(hash_pwd, password):
-                # user = User()
-                # user.id = email
-                # flask_login.login_user(user) #okay login in user
-                # return flask.redirect(flask.url_for('protected')) #protected is a function
-
-                cursor.execute("SELECT * FROM user_profile WHERE email = '{0}'".format(email))
-                user = cursor.fetchone()
-
-                return render_template('profile.html', email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
-	#information did not match
-    conn.close()
-    return render_template("bad_login.html")
-
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-    if request.method == "GET":
-        return render_template('signup.html')
-    else: 
-        email = request.form.get('email')
-        first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
-        pronouns = request.form.get('pronouns')
-        preferences = request.form.get('preferences')
-        dob = request.form.get('dob')
-        token = request.form.get('token')
-        refresh_token = request.form.get('refresh_token')
-        #image = request.files['image']
-        password = request.form.get('password')     
-
-        # open connection to database
-        db = get_db()
-
-        query = f"SELECT email FROM user_profile where email='{email}'"   
-        usedEmail = db.execute(query)
-        #user = ProfileDating.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
-
-        for row in usedEmail:       
-            if row: # if a user is found, we want to redirect back to signup page so user can try again
-                flash('Email address already exists')
-                return redirect(url_for('signup'))
-
-        # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-        db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, refresh_token, generate_password_hash(password, method='sha256')) )
-
-        # add the new user to the database
-        # db.session.add(new_user)
-        # db.session.commit()
-        db.commit()
-
-        return render_template('profile.html', email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob)
-
-@app.route('/logout')
-def logout():
-    return 'Logout'
+    ''' path for testing purposes '''
+    pass 
 
 @app.route('/authspotify')
 def oauth_spotify():
+    ''' /authspotify uses the getUser '''
     data =  getUser()
     return render_template('oauth_callback.html', data=data)
 
@@ -180,6 +62,114 @@ def callback():
             flash('Email address already exists')
 
     return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    ''' /signup pathway with both GET and POST. GET
+        render's the signup.html form, and the POST gets 
+        info from the form, checks if the email is 
+        used already, and redirects if that's the case. 
+        adds user to db and commits the change, 
+        then renders the profile page displaying their info'''
+
+    #if get, show form for signup 
+    if request.method == "GET":
+        return render_template('signup.html')
+
+    #if post, get all information from form 
+    else: 
+        # retrieve all information from the form 
+        email = request.form.get('email')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        pronouns = request.form.get('pronouns')
+        preferences = request.form.get('preferences')
+        dob = request.form.get('dob')
+        token = request.form.get('token')
+        refresh_token = request.form.get('refresh_token')
+        password = request.form.get('password')     
+
+        # open connection to database
+        db = get_db()
+
+        # query to get email where email matches, to see if email is already in use
+        query = f"SELECT email FROM user_profile where email='{email}'"   
+        usedEmail = db.execute(query)
+
+        #if email already in use, user is found, redirect back to signup page so user can try again
+        for row in usedEmail:       
+            if row: 
+                flash('Email address already exists')
+                return redirect(url_for('signup'))
+
+        # otherwise create a new user with the form data. Hash the password so the plaintext version isn't saved.
+        db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, refresh_token, generate_password_hash(password, method='sha256')) )
+
+        #commit the changes to the db and close the db 
+        db.commit()
+        close_db()
+
+        #render the profile html so that the information can be viewed 
+        return render_template('profile.html', email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    ''' login pathway with both GET and POST. GET
+        render's the login.html form, and the POST gets 
+        info from the form, finds if the user is in the db
+        checks the pass with the hash and redirects to profile.html
+        but otherwise provides a redirect with bad_login.html '''
+
+    #if get, show form for login    
+    if request.method == "GET":
+        return render_template('login.html')
+    
+    #if post, get email from form 
+    else:
+        email = request.form.get('email')
+
+        #open connection and cursor to database  
+        conn = sqlite3.connect('db.sqlite')
+        cursor = conn.cursor()
+
+        #if cursor.execute return a response, the email is in db and data can be fetched
+        if cursor.execute("SELECT password FROM user_profile WHERE email = '{0}'".format(email)):
+            data = cursor.fetchall()
+
+            #get the hashed from the db and the input from the form 
+            hash_pwd = str(data[0][0] )
+            password = request.form.get('password')
+
+            #if the hash check authenticates, then move forward with getting the profile info from db
+            if check_password_hash(hash_pwd, password):
+                
+                #select all the info from the db and fetch only one from the cursor and store in user
+                cursor.execute("SELECT * FROM user_profile WHERE email = '{0}'".format(email))
+
+                #user = [email, first, last, pronouns, pref, dob, a_token, r_token, hash]
+                user = cursor.fetchone()
+
+                #close the connection 
+                conn.close()
+                #render the profile template, displaying all their info back to them 
+                return render_template('profile.html', email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+	
+    #if we reach here the password or email did not match, so close the connection and render bad_login
+    conn.close()
+    return render_template("bad_login.html")
+
+@app.route('/profile')
+def profile():
+    ''' nonfunctional pathway for /profile''' 
+    pass #return render_template('profile.html')
+
+@app.route('/logout')
+def logout():
+    ''' nonfunctional path for /logout'''
+    return 'Logout'
+
 
 @app.route('/getAllUsers', methods=['GET', 'POST'])
 def getAllUsers():
