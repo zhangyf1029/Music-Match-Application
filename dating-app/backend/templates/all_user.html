@@ -11,15 +11,22 @@
 
 {% for user in all_users %}
 <div class="box">
-<h2>{{user[1][1]}}</h2> <br> 
+
+<form action="/profile" method='POST'>
+    <input type="hidden" name="user" value="{{user[1]}}">
+    <button class="button is-block is-info is-large is-fullwidth">Meet {{user[1][1]}}!</button>
+</form>
+
+<br>
 <h3>Match Score: {{user[0]}}% </h3><br> 
-These are their top 3 artists:
+{{user[1][1]}}'s top 3 artists:
 <ul>
 {% for artist_num in range(3) %}
 <li>{{user[2][artist_num]}}</li>
 
 {% endfor %}
 </ul>
+<br>
 
 <form action="/getEvents" method='POST'>
     <input type="hidden" name="self_email" value="{{self_email}}">

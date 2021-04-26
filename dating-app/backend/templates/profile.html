@@ -3,24 +3,38 @@
 {% block content %}
 
 {{data}}
+{% if all == 1 %}
 <h1 class="title">
   Welcome {{first_name}} {{last_name}}! </h1>
-  <h3 class="title">
- ({{pronouns}}) </h3>
+  <h3 class="title"> ({{pronouns}}) </h3>
+{% else %}
+<h1 class="title">
+  Meet {{first_name}} {{last_name}}! </h1>
+  <h3 class="title"> ({{pronouns}}) </h3>
+  
+  Contact at {{email}}
+{% endif %}
+ 
   <br>
   Noted preferences in a match: {{preferences}}
   <br>
   Birthday: {{dob}}
+
+<br>
 
   <form action="/getUserTopArtist" method='POST'>
     <input type="hidden" name="email" value="{{email}}">
     <button class="button is-block is-info is-large is-fullwidth">See Top Artist</button>
 
   </form>
-<p></p>
+
+<br>
+<br>
+{% if all == 1 %}
   <form action="/getMatches" method='POST'>
     <input type="hidden" name="email" value="{{email}}">
     <button class="button is-block is-info is-large is-fullwidth">See Matches</button>
   </form>
+{% endif %}
 
 {% endblock %}

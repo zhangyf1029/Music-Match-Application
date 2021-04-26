@@ -33,8 +33,8 @@ def authspotify():
     data =  getUser()
 
     # return redirect(data)
-    return jsonify({'data': data})
-    # return render_template('oauth_callback.html', data=data)
+    # return jsonify({'data': data})
+    return render_template('oauth_callback.html', data=data)
 
 @app.route('/callback/')
 def callback():
@@ -92,8 +92,8 @@ def callback():
 
     #return cookie here 
 
-    return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
-    # return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
+    # return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
+    return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -145,7 +145,7 @@ def signup():
         close_db()
 
         #render the profile html so that the information can be viewed 
-        return render_template('profile.html', email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob)
+        return render_template('profile.html', all=1, email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=preferences, dob=dob)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -188,7 +188,7 @@ def login():
                 #close the connection 
                 conn.close()
                 #render the profile template, displaying all their info back to them 
-                return render_template('profile.html', email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+                return render_template('profile.html', all=1, email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
 	
     #if we reach here the password or email did not match, so close the connection and render bad_login
     conn.close()
@@ -198,10 +198,23 @@ def login():
 def getUserInfo():
     pass
 
-@app.route('/profile')
+@app.route('/profile', methods=['POST'])
 def profile():
-    ''' nonfunctional pathway for /profile''' 
-    pass #return render_template('profile.html')
+    ''' /profile gets a profile without the matches displayed. 
+        This is a page to see the other profile's information 
+        but not from a logged in stand point''' 
+
+    # post method from the see all matches page
+    if request.method == "POST":
+        #get the full user info 
+        str_user = request.form.get('user')
+
+        #convert string to dict 
+        user = eval(str_user)
+
+        #do not show all the buttons on the profile, since this is read only 
+        return render_template('profile.html', all=0, email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+
 
 @app.route('/logout')
 def logout():
