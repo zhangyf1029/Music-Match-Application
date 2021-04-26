@@ -4,9 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from .startup import *
 from .flask_spotify_auth import getRefreshToken, refreshAuth
-from .db import get_db
+from .db import get_db, close_db
 from .__init__ import app 
 
+from flask_cors import CORS, cross_origin
+CORS(app, support_credentials=True)
 
 # VIRTUAL ENVIRONMENT RUN CMD FOR WINDOWS
 #.\venv\Scripts\activate
@@ -25,44 +27,65 @@ def test():
 
 @app.route('/authspotify')
 def oauth_spotify():
-    ''' /authspotify uses the getUser '''
+    ''' /authspotify uses the getUser which calls getAuth
+        together it puts together a url that is used 
+        to make the first api call  '''
     data =  getUser()
     return render_template('oauth_callback.html', data=data)
 
 @app.route('/callback/')
 def callback():
+    ''' /callback pathway with GET. this is the 
+        redirect uri from spotify and the data that comes 
+        from auth_spotify getUser() url first api call, the code 
+        that is in the arguments is used to getUserToken() and make
+        the second api call. Then we can get the token, set up headers
+        and make third api call to get top artist info and user 
+        info and check to make sure email is not used already and return'''
+
+    #retreive str argument from code and supply it to getUserToken     
     code = request.args.get('code', default = '', type=str)
     getUserToken(code)
-    token = getAccessToken()
-    # refreshAuth()
+
+    #retrieve token list from getAccessToken    
+    token = getAccessToken()        #token [a_token, auth_head, scope, expires, r_token]
+
+    #set up r_token and rest of fields as token and parse out the auth_header
     refresh_token = token[4]
     token = token[:4]
     auth_header = token[1]['Authorization']
 
+    #set up header with proper settings for api call 
     headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
     'Authorization': auth_header,
     }
 
+    #retrieve top_artist response and get the json into data 
     response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
     data = response.json()
+
+    #retrieve user info response and get the json into userinfo
     response_userinfo = requests.get('https://api.spotify.com/v1/me/', headers=headers)
     userinfo = response_userinfo.json()
 
     # open connection to database
     db = get_db()
 
+    # query to get email where email matches, to see if email is already in use
     query = f"SELECT email FROM user_profile where email='{userinfo['email']}'"   
     usedEmail = db.execute(query)
-    #user = ProfileDating.query.filter_by(email=email).first() # if this returns a user, then the email already exists in database
 
+    #if email already in use, user is found, redirect back to signup page so user can try again
     for row in usedEmail:       
-        if row: # if a user is found, we want to redirect back to signup page so user can try again
+        if row: 
             flash('Email address already exists')
 
-    return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
+    #close db connection and return json         
+    close_db()
 
+    return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
     # return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
 
 
@@ -173,57 +196,77 @@ def logout():
     return 'Logout'
 
 
-@app.route('/getAllUsers', methods=['GET', 'POST'])
+@app.route('/getAllUsers', methods=['GET'])
 def getAllUsers():
-    # if request.method == "GET":
+    ''' test query to send a json to the front end, 
+        method is a GET and should return first_name 
+        and email of all users '''
+
+    # open connection to database
     conn = sqlite3.connect('db.sqlite')
     cursor = conn.cursor()
+
+    #query for all users in the table and fetchall the info 
     cursor.execute("SELECT * FROM user_profile")
     users = cursor.fetchall()
 
+    #iterate through and generate a list of the information 
     all_users = []
 
     for user in users:
         all_users.append({'first_name':user[1], 'email':user[0]})
+
+    #close the db connection
     conn.close()
 
+    #convert to json and return 
     return jsonify({'users':all_users})
 
-    # test = 'i am test user'
-    # return jsonify({'users':test})
-
-    # return all_users
-
-@app.route('/getOtherUsers', methods=['GET', 'POST'])
 def getOtherUsers(email):
-    # if request.method == "GET":
+    ''' getOtherUsers is a helper function that for a given 
+        email, makes a query and returns a list of all other
+        users excluding the one whose email was given '''
+
+    #open connection to database
     conn = sqlite3.connect('db.sqlite')
     cursor = conn.cursor()
+
+    #make a query to the database with the given email to exclude and fetchall 
     cursor.execute("SELECT * FROM user_profile WHERE NOT email='{0}'".format(email))
     users = cursor.fetchall()
 
+    #iterate through and generate a list of the information 
     all_users = []
 
     for user in users:
         all_users.append({'first_name':user[1], 'email':user[0]})
 
-    # return jsonify({'users':all_users})
+    # close db connection and return all_users list of dictionaries
     conn.close()
 
     return all_users
 
 @app.route('/getUserTopArtist', methods=['POST'])
 def getUserTopArtist():
+    ''' for a given user, retrieves their email and makes 
+        an api call to get their top artists and renders 
+        and html file for that '''
+
+    #get the email from the hidden field 
     email = request.form.get('email')
+
+    #open connection to database and query for user where their email pk matches and fetch one
     conn = sqlite3.connect('db.sqlite')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
-    users = cursor.fetchone()
+    users = cursor.fetchone() #users [email, first, last, pronouns, pref, dob, a_token, r_token, hash]
 
+    #if a user is there then grab their token and r_token from the db
     if users:
         token = users[6]
         refresh_token = users[7]
 
+        #set up the auth head to pass in to the header for the api call 
         authorization = f'Bearer {token}'      
 
         headers = {
@@ -232,16 +275,26 @@ def getUserTopArtist():
         'Authorization': authorization,
         }
 
+        #make the api call for top artists and return response to json 
         response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
         data = response.json()
+
+        #if there is an error then refresh the a_token
         if 'error' in data.keys():
+
+            #call RefreshAuth and get the new_token_info and pick out a_token 
             new_token_info = refreshAuth(refresh_token)
             new_access_token = new_token_info['access_token']
+
+            #update the db with the new a_token for this email pk and commit 
             cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
             conn.commit()
+
+            #query for user where their email pk matches and fetch one
             cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
             users = cursor.fetchone()
 
+            # set up auth_head with new token and proper headers
             authorization = f'Bearer {new_access_token}'      
 
             headers = {
@@ -250,31 +303,43 @@ def getUserTopArtist():
             'Authorization': authorization,
             }
 
+            #make api call to for top artists and store json response in data 
             response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
             data = response.json()
 
+        #data comes back with items key in dict
         data = data['items']
+
+        #iterate through data.items to retrieve just the name and image url of the artist
         name = []
         url = []
 
         for artist in data:
             name.append(artist['name'])
             url.append(artist['images'][0]['url'])
+
+    #close the db connection and render the template
     conn.close()
 
     return render_template('top_artist.html', name=name, url=url, len=len(name))
 
-@app.route('/getTopArtist', methods=['POST'])
 def getTopArtist(email):
+    ''' getTopArtist helper function that takes the 
+        email of the person to make the api call and 
+        return their top artists'''
+
+    #open connection to database and query for user where their email pk matches and fetch one
     conn = sqlite3.connect('db.sqlite')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
     users = cursor.fetchone()
 
+    #if a user is there then grab their token and r_token from the db
     if users:
         token = users[6]
         refresh_token = users[7]
 
+        #set up the auth head to pass in to the header for the api call 
         authorization = f'Bearer {token}'      
 
         headers = {
@@ -283,16 +348,26 @@ def getTopArtist(email):
         'Authorization': authorization,
         }
 
+        #make the api call for top artists and return response to json 
         response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
         data = response.json()
+
+        #if there is an error then refresh the a_token
         if 'error' in data.keys():
+
+            #call RefreshAuth and get the new_token_info and pick out a_token 
             new_token_info = refreshAuth(refresh_token)
             new_access_token = new_token_info['access_token']
+            
+            #update the db with the new a_token for this email pk and commit 
             cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
             conn.commit()
+
+            #query for user where their email pk matches and fetch one
             cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
             users = cursor.fetchone()
 
+            # set up auth_head with new token and proper headers
             authorization = f'Bearer {new_access_token}'      
 
             headers = {
@@ -301,62 +376,109 @@ def getTopArtist(email):
             'Authorization': authorization,
             }
 
+            #make api call to for top artists and store json response in data 
             response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
             data = response.json()
 
+        #data comes back with items key in dict
         data = data['items']
+
+        #iterate through data.items to retrieve just the name and image url of the artist
         name = []
         url = []
 
         for artist in data:
             name.append(artist['name'])
             url.append(artist['images'][0]['url'])
+        
+        #close the db connection and return a list 
         conn.close()
 
         return [users, name, url]
 
-@app.route('/getMatchPercent', methods=['GET', 'POST'])
 def getMatchPercent(self_email, other_email):
+    ''' helper function to get match percentages 
+        between two users with emails used as pk 
+        to get data '''
+
+    #use getTopArtist on each user 
     self_top = getTopArtist(self_email) #returns [users, name, url]
     other_top = getTopArtist(other_email) #returns [users, name, url]
+
+    #initialize match_count to 0
     match_count = 0
+
     #self_top[1] is names of top artists
-    for self_top_artist in self_top[1]: #self top artist is each top artist of self
-         #other[1] is names of top artists
+    #self top artist is each top artist of self
+    for self_top_artist in self_top[1]: 
+
+         #other[1] is names of top artists, and if match increment 
          if self_top_artist in other_top[1]:
              match_count+= 1
-    # return (match_count / len(self_top[1])) * 100
+
+    #spotify gives top 20 artists so div by 20 and mult by 100 for %
     return (match_count / 20) * 100
 
 @app.route('/getMatches', methods=['GET', 'POST'])
 def getMatches():
+    ''' /getMatches is a post method that asks for a users
+        email and uses that to get match percent
+        of all users in the database and returns the sorted 
+        list of users and their match scores'''
+    
+    #form is a post 
     if request.method == 'POST':
+        #retrieve the users emails 
         self_email = request.form.get('email')
+
+        #call helper function to get all the other users in db
         other_users = getOtherUsers(self_email)
+
+        #iterature through the other users and generate their matches
         all_users_top = []
         for user in other_users:
+
+            #retrieve the other users email 
             other_email = user['email']
+
+            #get topArtist of the other user so that we can display on match page
             user_top = getTopArtist(other_email)  #returns [users, name, url]
+
+            # get match_percent between the two users 
             match_percent = getMatchPercent(self_email, other_email)
+
+            #only append to the beginning of the list if > 0
             if(match_percent > 0):
-                user_top.insert(0, match_percent)
+                user_top.insert(0, match_percent) #user top = [match_percent, users, name, url]
+
+                #append to the main list 
                 all_users_top.append(user_top)
+
+        #if non empty list then sort by match_percent and descending order
         if all_users_top:
             all_users_top.sort(reverse=True) #[ match_percent, users, name_top_artists, url_top_artist]
+
+        #get the length of the matches so that it can be used to error check and send info for template
         size = len(all_users_top)
         return render_template("all_user.html", self_email=self_email, all_users=all_users_top, size = size)
 
-@app.route('/getTopGenres', methods=['POST'])
 def getTopGenres(email):
+    ''' helper function that takes the email and 
+        makes an api call to get the users top genres 
+        and return a consolidated list '''
+
+    #open connection to database and query for user where their email pk matches and fetch one
     conn = sqlite3.connect('db.sqlite')
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
     users = cursor.fetchone()
 
+    #if a user is there then grab their token and r_token from the db
     if users:
         token = users[6]
         refresh_token = users[7]
 
+        #set up the auth head to pass in to the header for the api call 
         authorization = f'Bearer {token}'      
 
         headers = {
@@ -365,16 +487,26 @@ def getTopGenres(email):
         'Authorization': authorization,
         }
 
+        #make the api call for top artists and return response to json 
         response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
         data = response.json()
+
+        #if there is an error then refresh the a_token
         if 'error' in data.keys():
+
+            #call RefreshAuth and get the new_token_info and pick out a_token 
             new_token_info = refreshAuth(refresh_token)
             new_access_token = new_token_info['access_token']
+            
+            #update the db with the new a_token for this email pk and commit 
             cursor.execute("UPDATE user_profile set access_token = '{0}' where email='{0}'".format(new_access_token, email))
             conn.commit()
+
+            #query for user where their email pk matches and fetch one
             cursor.execute("SELECT * FROM user_profile where email='{0}'".format(email))
             users = cursor.fetchone()
 
+            # set up auth_head with new token and proper headers
             authorization = f'Bearer {new_access_token}'      
 
             headers = {
@@ -383,20 +515,27 @@ def getTopGenres(email):
             'Authorization': authorization,
             }
 
+            #make api call to for top artists and store json response in data 
             response = requests.get('https://api.spotify.com/v1/me/top/artists', headers=headers)
             data = response.json()
 
+        #data comes back with items key in dict
         data = data['items']
         genres = []
 
+        #iterate through data.items to retrieve just the genre of the artist
         for artist in data:
             genres.append(artist['genres'])
-            
+        
+         #close the db connection 
         conn.close()
 
+        # make a list of the users info and the consolidated genre list
         return [users, genreListConsolidate(genres)]
 
 def genreCategorize(genre):
+    ''' helper function to organize the 1516 spotify
+        genres into the ticketmaster umbrella genres '''
     if('pop' in genre):
         genre = "Pop"
     elif('rap' in genre):
@@ -446,50 +585,88 @@ def genreCategorize(genre):
     else:
         genre = "Other"
 
+    #after assigning a renamed umbrella term return genre
     return genre
 
 
 def genreListConsolidate(genre_list):
+    ''' helper function to take a list of lists and 
+        consolidate it into an ordered list in the
+        ticketmaster genre umbrella terms rather than
+        the spotify obnoxious ones '''
+
+    #use the itertools.chain to conver the list of lists into a flat list
     flat_list = list(itertools.chain(*genre_list))
 
+    # convert the flat_list of all the spotify genres into a dictionary with counts
     genres = {x:flat_list.count(x) for x in flat_list}
 
+    # categorize each of the spotify genres into the umbrella terms and make a list
     genres_umbrella = [genreCategorize(spotify_genre) for spotify_genre in flat_list]
 
+    # conver the list of the ticketmatster genres into a dictionary with counts
     genres = {x:genres_umbrella.count(x) for x in genres_umbrella}
 
+    #sort the dictionary by counts and descending so highest occurence first
     sorted_genres = dict(sorted(genres.items(), key=operator.itemgetter(1),reverse=True))
 
+    #get the keys which are the umbrella genres as a list and return them 
     genre_keys = list(sorted_genres.keys())
 
     return genre_keys
 
 def compareGenres(self_genre, other_genre):
+    ''' helper function that takes 2 people umbrella
+        genres lists and creates a list of their 
+        genres they have in common'''
+
+    #lc through the self and add to both_genre only if in other_genre
     both_genre = [genre for genre in self_genre if genre in other_genre]
+
+    #return the list with genres only in both peoples 
     return both_genre
 
 
 @app.route('/getEvents', methods=['GET', 'POST'])
 def getEvents():
+    ''' /getEvents path is a Post that takes 
+        both the self and other users emails and compares their genres
+        using the list of genres, it takes the first item in the list and 
+        makes a call to the ticketmaster api to get events for that genre
+        in Boston (02215) '''
     if request.method == 'POST':
+
+        #retrieve the emails of self and other
         self_email = request.form.get('self_email')
         other_email = request.form.get('other_email')
 
+        #get top genres for each user 
         user_top = getTopGenres(self_email) # [users, genres] where genres is a sorted list
         other_top = getTopGenres(other_email) # [users, genres]
 
         #compare genres
         genre = compareGenres(user_top[1], other_top[1])
 
-        # return render_template("match_events.html", data_self=user_top, data_other=other_top)
+        # if the genre list has more than one genre 
+        if len(genre) >= 0:  
+
+            #retrieve the first genre      
+            classificationName = genre[0] 
+
+            #enter the classificationName into the api call and get json response back 
+            response = requests.get(f"https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=02215&classificationName={classificationName}")
+            json_res = response.json()
+
+            #if the response is empty show no_results page
+            if json_res["page"]["totalElements"] == 0:
+                return render_template('no_results.html')
+
+            #otherwise grab the info from _embedded.events in the reponse and render it 
+            else: 
+                return render_template("match_events.html", events=list(json_res["_embedded"]["events"]))
         
-        classificationName = genre[0] #ENTER GENRE NAME
-        response = requests.get(f"https://app.ticketmaster.com/discovery/v2/events.json?apikey=PBSmqVGp0ZUUCVC3VKJ3oTH3SWnidD7S&classificationName=music&countryCode=US&postalCode=02215&classificationName={classificationName}")
-        json_res = response.json()
-        if json_res["page"]["totalElements"] == 0:
-            return render_template('no_results.html')
-        else: 
-            return render_template("match_events.html", events=list(json_res["_embedded"]["events"]))
+        #no common umbrella genres 
+        return render_template('no_results.html')
 
     
 if __name__ == '__main__':
