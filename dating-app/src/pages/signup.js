@@ -15,11 +15,8 @@ const Signup = () => {
   }, [])
 
   const fetchTasks = async() => {
-    const rest = await fetch ('http://localhost:5000/authspotify'
-    , {
-      mode: 'cors',
-      method: "GET"})
-    const data = await rest.json()
+    const rest = await fetch ('http://localhost:5000/authspotify')
+    const data = await rest.text()
   
     return data
   }
@@ -43,7 +40,7 @@ const Signup = () => {
   }
   return (
     <div className="container">
-      <Tasks tasks={tasks}/>
+        <button onClick={async () => {await fetchTasks("Example");}}>Sign Up</button>
     </div>
     // <html>
     //   <head>

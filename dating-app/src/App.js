@@ -19,7 +19,7 @@ const SignUpForm = () => {
     // const getTasks = async () => {
     //   const tasksFromServer = await fetchTasks() 
     //   setTasks(tasksFromServer)
-    fetch("/getAllUsers").then(response => response.json().then(data => {setUsers(data.users);})); 
+    // fetch("/getAllUsers").then(response => response.json().then(data => {setUsers(data.users);})); 
 
   //   getTasks()
   }, [])
@@ -56,7 +56,7 @@ const SignUpForm = () => {
     height: '100vh',
   }
 
-  console.log(users);
+  // console.log(users);
 
   return (
     // <div className="App">
