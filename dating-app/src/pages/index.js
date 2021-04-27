@@ -11,7 +11,7 @@ const Home = () => {
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title">
-                Welcome to .... App
+                Welcome to Music Match
               </h1>
 
               <div class="column is-4 is-offset-4">

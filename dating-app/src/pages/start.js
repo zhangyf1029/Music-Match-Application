@@ -11,11 +11,13 @@ const Start = () => {
           <div class="hero-body">
             <div class="container has-text-centered">
               <h1 class="title">
-                We are aspiring students
+                Connect with people around Boston
               </h1>
-              <h2 class="subtitle">
-                With a passion in making connection and helping people find connection
-              </h2>
+              <div class="column is-4 is-offset-4">
+              <form method="GET" action="/signup">
+                <button class="button is-block is-info is-large is-fullwidth">Start Now</button>
+              </form>
+              </div>
             </div>
           </div>
         </section>

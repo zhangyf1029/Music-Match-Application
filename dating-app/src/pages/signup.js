@@ -1,6 +1,8 @@
 import React from 'react';
+import { useHistory } from "react-router-dom"; 
 import {useState, useEffect } from 'react'
 import {Nav,NavLink,Bars,NavMenu,NavBtn,NavBtnLink} from '../Components/Navbar/NavbarElements'
+import 'bulma/css/bulma.min.css';
 // export const Users = ({ users }) => { return (<div>{movies.length}</div> ) }
 
 // const Signup = () => {
@@ -57,7 +59,7 @@ import {Nav,NavLink,Bars,NavMenu,NavBtn,NavBtnLink} from '../Components/Navbar/N
         })
         .then( (response) => response.json()
         )
-        .then( (data) => console.log(data.data))
+        .then(data => {this.setState({url: data.data})})
       }
     // const res = await fetch('http://localhost:5000/authspotify' , {
     //   method: "POST",
@@ -75,28 +77,39 @@ import {Nav,NavLink,Bars,NavMenu,NavBtn,NavBtnLink} from '../Components/Navbar/N
     // .then((info) => { console.log(info); })
 
     render(){  return (
+      <div class="hero-body">
+      <div class="container has-text-centered">
+         
+        <h1 class="title" >
+          Sign Up Today
+        </h1>
+        <h2 class="subtitle" >
+          Using Spotify very secure network
+        </h2>
       <div class="column is-4 is-offset-4">
-
-       <form onSubmit={this.handleSubmit}>
-        {/* <button onClick={async () => {await fetchTasks();}}>Sign Up</button> */}
-        <button class="button is-block is-info is-large is-fullwidth">Sign Up With Spotify</button>
-        </form> 
+          <form action="" onSubmit={this.handleSubmit}>
+            {/* <button onClick={async () => {await fetchTasks();}}>Sign Up</button> */}
+            <button class="button is-block is-info is-large is-fullwidth">Sign Up With Spotify</button>
+          </form>
         </div>
+        </div>
+        </div>
+        
     // <html>
     //   <head>
     //     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
     //   </head>
     //   <body>
     //     <section class="hero is-primary is-fullheight">
-    //       <div class="hero-body">
-    //         <div class="container has-text-centered">
+          // <div class="hero-body">
+          //   <div class="container has-text-centered">
                
-    //         <h1 class="title">
-    //           Music Match
-    //         </h1>
-    //         <h2 class="subtitle">
-    //           Let your music play matchmaker today. 
-    //         </h2>
+          //   <h1 class="title">
+          //     Music Match
+          //   </h1>
+          //   <h2 class="subtitle">
+          //     Let your music play matchmaker today. 
+          //   </h2>
 
     //           <div class="column is-4 is-offset-4">
 
