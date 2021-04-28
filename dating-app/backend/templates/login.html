@@ -13,11 +13,20 @@
         {% endwith %}
 
         <form method="POST" action="/login">
+
+            {% if email %}
+            <div class="field">
+                <div class="control">
+                    <input class="input is-large" type="email" name="email" value="{{email}}" autofocus="">
+                </div>
+            </div>
+            {% else %}
             <div class="field">
                 <div class="control">
                     <input class="input is-large" type="email" name="email" placeholder="Your Email" autofocus="">
                 </div>
             </div>
+            {% endif %}
 
             <div class="field">
                 <div class="control">

@@ -93,7 +93,7 @@ def callback():
     #return cookie here 
 
     # return jsonify({'data':data, 'userInfo':userinfo, "token":token, "refresh_token":refresh_token})
-    return render_template('signup.html', data=data, userinfo=userinfo, token=token, refresh_token=refresh_token)
+    return render_template('signup.html', userinfo=userinfo, token=token, refresh_token=refresh_token)
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -131,11 +131,12 @@ def signup():
         query = f"SELECT email FROM user_profile where email='{email}'"   
         usedEmail = db.execute(query)
 
-        #if email already in use, user is found, redirect back to signup page so user can try again
+        #if email already in use, user is found, redirect to login page and fill in their email
         for row in usedEmail:       
             if row: 
-                flash('Email address already exists')
-                return redirect(url_for('signup'))
+                flash('Email address already exists so please log in here!')
+                return render_template('login.html', email=email )
+                # return redirect(url_for('signup'))
 
         # otherwise create a new user with the form data. Hash the password so the plaintext version isn't saved.
         db.execute("INSERT INTO user_profile VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);", (email, first_name, last_name, pronouns, preferences, dob, token, refresh_token, generate_password_hash(password, method='sha256')) )
@@ -214,6 +215,65 @@ def profile():
 
         #do not show all the buttons on the profile, since this is read only 
         return render_template('profile.html', all=0, email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+
+
+
+
+@app.route('/update_form', methods=['POST'])
+def update_form():
+    ''' /updateProfile pathway with POST. POST
+        render's the update.html form and prefills
+        the information from what they currently have'''
+
+    #if get, show form for signup 
+    if request.method == "POST":
+        email = request.form.get('email')
+        # print(email)
+
+        #open connection and cursor to database  
+        conn = sqlite3.connect('db.sqlite')
+        cursor = conn.cursor()
+
+        #select all the info from the db and fetch only one from the cursor and store in user
+        cursor.execute("SELECT * FROM user_profile WHERE email = '{0}'".format(email))
+
+        #user = [email, first, last, pronouns, pref, dob, a_token, r_token, hash]
+        user = cursor.fetchone()
+
+        #close the connection 
+        conn.close()
+
+        # print(userinfo)
+
+        return render_template('update.html', email=email, first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
+
+@app.route('/update_profile', methods=['POST'])
+def update_profile():
+    ''' /update_profile pathway with POST. POST gets 
+        info from the form updates user and commits the change, 
+        then renders the profile page displaying their info'''
+    #if post, get all information from form 
+    if request.method == "POST": 
+        # retrieve all information from the form 
+        email = request.form.get('email')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        pronouns = request.form.get('pronouns')
+        pref = request.form.get('preferences')
+        dob = request.form.get('dob')
+
+        # open connection to database
+        db = get_db()
+
+        # update a new user with the form data. Hash the password so the plaintext version isn't saved.
+        db.execute(f"UPDATE user_profile SET first_name='{first_name}', last_name='{last_name}', pronouns='{pronouns}', preferences='{pref}', dob='{dob}' WHERE email='{email}'")
+
+        #commit the changes to the db and close the db 
+        db.commit()
+        close_db()
+
+        #render the profile html so that the information can be viewed 
+        return render_template('profile.html', all=1, email=email, first_name=first_name, last_name=last_name, pronouns=pronouns, preferences=pref, dob=dob)
 
 
 @app.route('/logout')

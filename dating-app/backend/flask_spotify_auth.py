@@ -1,11 +1,10 @@
 import base64, json, requests
 
+from .config import CLIENT_ID, CLIENT_SECRET
+
 SPOTIFY_URL_AUTH = 'https://accounts.spotify.com/authorize/?'
 SPOTIFY_URL_TOKEN = 'https://accounts.spotify.com/api/token/'
-#Add your client ID
-CLIENT_ID = "7c1f2bab60504b6e91baaf93b7ff0c10"
-#aDD YOUR CLIENT SECRET FROM SPOTIFY
-CLIENT_SECRET = "c27bc4507c8b41a6b3ffed7db05c21d6"
+
 RESPONSE_TYPE = 'code'   
 HEADER = 'application/x-www-form-urlencoded'
 REFRESH_TOKEN = ''

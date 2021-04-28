@@ -2,11 +2,16 @@
 
 {% block content %}
 
-{{data}}
+<div class="column is-4 is-offset-4">
 {% if all == 1 %}
 <h1 class="title">
   Welcome {{first_name}} {{last_name}}! </h1>
   <h3 class="title"> ({{pronouns}}) </h3>
+
+  <form action="/update_form" method='POST'>
+    <input type="hidden" name="email" value="{{email}}">
+    <button class="button is-block is-info is-small is-fullwidth">Update my info!</button>
+  </form>
 {% else %}
 <h1 class="title">
   Meet {{first_name}} {{last_name}}! </h1>
@@ -24,8 +29,7 @@
 
   <form action="/getUserTopArtist" method='POST'>
     <input type="hidden" name="email" value="{{email}}">
-    <button class="button is-block is-info is-large is-fullwidth">See Top Artist</button>
-
+    <button class="button is-block is-info is-large is-fullwidth">See Top Artists</button>
   </form>
 
 <br>
@@ -36,5 +40,7 @@
     <button class="button is-block is-info is-large is-fullwidth">See Matches</button>
   </form>
 {% endif %}
+
+</div>
 
 {% endblock %}
