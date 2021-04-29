@@ -216,6 +216,29 @@ def profile():
         #do not show all the buttons on the profile, since this is read only 
         return render_template('profile.html', all=0, email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
 
+@app.route('/returnToProfile', methods=['POST'])
+def returnToProfile():
+    ''' /returnToProfile pathway with POST. POST gets 
+        email from the form, and redirects to 
+        render the profile page displaying their info'''
+    
+    if request.method == "POST":
+        email = request.form.get('email')
+
+        #open connection and cursor to database  
+        conn = sqlite3.connect('db.sqlite')
+        cursor = conn.cursor()
+            
+        #select all the info from the db and fetch only one from the cursor and store in user
+        cursor.execute("SELECT * FROM user_profile WHERE email = '{0}'".format(email))
+
+        #user = [email, first, last, pronouns, pref, dob, a_token, r_token, hash]
+        user = cursor.fetchone()
+
+        #close the connection 
+        conn.close()
+        #render the profile template, displaying all their info back to them 
+        return render_template('profile.html', all=1, email=user[0], first_name=user[1], last_name=user[2], pronouns=user[3], preferences=user[4], dob=user[5])
 
 
 
@@ -407,7 +430,7 @@ def getUserTopArtist():
     #close the db connection and render the template
     conn.close()
 
-    return render_template('top_artist.html', name=name, url=url, len=len(name))
+    return render_template('top_artist.html', name=name, url=url, len=len(name), email=email)
 
 def getTopArtist(email):
     ''' getTopArtist helper function that takes the 

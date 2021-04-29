@@ -3,7 +3,14 @@
 
 
 {% block content %}
+
 <div class="column is-4 is-offset-4">
+
+    <form action="/returnToProfile" method='POST'>
+        <input type="hidden" name="email" value="{{email}}">
+        <button class="button is-block is-info is-small is-fullwidth">Back to my profile!</button>
+    </form>
+    <br>
 
     <h3 class="title">Update my info</h3>
     <div class="box">
@@ -48,5 +55,7 @@
             <button class="button is-block is-info is-large is-fullwidth">Update</button>
         </form>
     </div>
+
+
 </div>
 {% endblock %}
