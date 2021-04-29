@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'; //, { useState, useEffect } from 'react';
-import Header from './Components/Header'
 import HandleSubmit from './Components/HandleSubmit'
 import Navbar from './Components/Navbar/index'
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
@@ -57,19 +56,10 @@ const SignUpForm = () => {
     height: '100vh',
   }
 
-  // console.log(users);
-
   return (
-    // <div className="App">
-    //   <Users users={users.map(users => <div>{users.email} <div>{users.first_name}</div> </div> )} />
-    // </div>
     <html>
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
-        {/* <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" 
-        rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous" />
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" 
-        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script> */}
       </head>
       <body style= {background}>
         <Router>
@@ -81,11 +71,6 @@ const SignUpForm = () => {
             <Route path ="/contact" component={Contact} />
             <Route path ="/signup" component={Signup} />
           </switch>
-          {/* <div className="container" style={{backgroundColor: "white"}}>
-            <Header />
-            <HandleSubmit onAdd={add}/>
-          </div> */}
-
         </Router>
        </body>
      </html>
@@ -93,111 +78,3 @@ const SignUpForm = () => {
 }
 
 export default SignUpForm;
-
-// class SignUpForm extends React.Component {
-//     constructor(props){
-//       super(props);
-//       this.state = {
-//         firstName: '', 
-//         pronouns: '', 
-//         preferences: ''};
-
-//       this.handleChange = this.handleChange.bind(this);
-//     }
-  
-//     handleChange(event) {
-//       this.setState({[event.target.name]: event.target.value});
-//     }
-
-//   const handleSubmit = asynch(task) => {
-//       //alert('You submitted the form');
-//       // get form data out of state
-//      // const { firstName, pronouns, preferences } = this.state;
-//      console.log("making request")
-//      alert('You passed the info in onsubmit');
-//      event.preventDefault();
-//     // get form data out of state
-//   //const { firstName, pronouns, preferences } = this.state;
-//     const res = await fetch('http://localhost:5000/add' , {
-//       method: "POST",
-//       headers: {
-//         'Content-type': 'application/json'
-//       },
-//       body: JSON.stringify(this.state)
-//     })
-//     const data = await  res.json()
-//     setTasks([...tasks, data])
-//     // .then((result) =>{
-//     //   return result.json()
-//     // } )
-//     // .then((info) => { console.log(info); })
-
-//   }
-     
-
-    //   fetch('http://localhost:5000/callback' , {
-    //     method: "POST",
-    //     headers: {
-    //       'Content-type': 'application/json'
-    //     }
-    //    // body: JSON.stringify('')
-    //   })
-    //   .then((result) =>{
-    //     alert('You passed the info');
-    //     return result.json();
-    //   } )
-    //   .then((info) => { console.log(info); })
-
-    //   event.preventDefault();
-
-    
-
-//     onSubmit = (event) => {
-       
-//       alert('You passed the info in onsubmit');
-//        event.preventDefault();
-//       // get form data out of state
-//       const { firstName, pronouns, preferences } = this.state;
-      
-//       fetch('http://localhost:5000/add' , {
-//         method: "POST",
-//         headers: {
-//           'Content-type': 'application/json'
-//         },
-//         body: JSON.stringify(this.state)
-//       })
-//       .then((result) =>{
-//         return result.json()
-//       } )
-//       .then((info) => { console.log(info); })
-
-//     }
-
-    // render(){
-    //   const { classes } = this.props;
-    //   const { first_name, pronouns, preferences } = this.state;
-    //   return (
-
-        
-    //     <form onSubmit={this.handleSubmit}>
-    //       <label> First name: 
-    //       <input name="firstName" type="text" value={this.state.first_name} onChange={this.handleChange} />
-    //       </label>
-    //       <br />
-
-    //       <label> Pronouns: 
-    //       <input name="pronouns" type="text" value={this.state.pronouns} onChange={this.handleChange} />
-    //       </label>
-    //       <br />
-
-    //       <label> Preferences: 
-    //       <input name="preferences" type="text" value={this.state.preferences} onChange={this.handleChange} />
-    //       </label>
-    //       <br />
-    //       <input type="submit" value="submit" />
-
-    //     </form>
-    //   );
-    // }
-// }
-

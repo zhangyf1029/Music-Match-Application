@@ -1,1 +1,21 @@
+Updated User Story:
+US2: User Login. The user enters an email. If the email or password  is not correct, a redirect page gives them the option to sign up with Spotify(US1) or try to login again  (see US1).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OLD: 
 US2: User Login. The user enters an email or phone number (depending on what they created the account with). A verification code is sent to their preferred method of sign-in, and they have to enter that code in the box which will log the user in. If the email or phone number is not registered, a dialog box to create a new account will redirect them to the initial sign-up (see US1).

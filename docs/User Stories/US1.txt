@@ -1,4 +1,24 @@
+Updated User Story:
+US1: Sign up for the website. A new user joins and uses authenticator via Spotify. Enter a valid email. If the email is not valid, users will be prompted to fix their email addresses. Users must have email and must have a valid password. 
+    US1.1: Profile Creation. After initial sign-up with spotify, users are prompted to enter their first name, last name, pronouns, preference. If any required information is missing, then prompt the user to fill in the requirement by reminding them the first name, pronouns, location, and authorization are required in red font. 
+    US1.2: *this is a user story that could be added for future versions of the app but is not a part of this version* Verification. Signed-up users (see US1) can submit a photo of themself doing certain poses, and users can submit a photo of a government-issued ID. Once these steps are completed and pictures are verified, the user will be considered verified. There will be a checkmark next to their name. Verification makes a profile more likely to be seen by potential matches (THIS IS NOT A REQUIRED STEP).
+        US1.2.1: Failure of step. Get a notification on the app stating the failure of verification (and reason), and an option is given to retry.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OLD: 
 US1: Sign up for the website. A new user joins and uses authenticator via Facebook/Twitter. Enter a valid email or phone number and a password. The password must be one uppercase, one lowercase, one number, and a minimum of 8 characters long. If the email is not valid, users will be prompted to fix their email addresses. After the phone number is submitted, a verification code is sent to that number, and you can only proceed with sign up if the correct verification code is entered. Users must have email or phone numbers and must have a valid password. 
-    US1.1: Profile Creation. After initial sign-up, users are prompted to enter their first name, last name (optional), profile picture (one required photo, adding more is optional), pronouns, preference, enable location, and authorize Spotify to link up. If any required information is missing, then prompt the user to fill in the requirement by reminding them the first name, pronouns, location, and authorization are required in red font. 
-    US1.2: Verification. Signed-up users (see US1) have the option to submit a photo of themself doing certain poses, and users can submit a photo of a government-issued ID. Once these steps are completed and pictures are verified, the user will be considered verified. There will be a checkmark next to their name. Verification makes a profile more likely to be seen by potential matches (THIS IS NOT A REQUIRED STEP).
-    US1.2.1: Failure of step. Get a notification on the app stating the failure of verification (and reason), and an option is given to retry.
+        US1.1: Profile Creation. After initial sign-up, users are prompted to enter their first name, last name (optional), profile picture (one required photo, adding more is optional), pronouns, preference, enable location, and authorize Spotify to link up. If any required information is missing, then prompt the user to fill in the requirement by reminding them the first name, pronouns, location, and authorization are required in red font. 
+        US1.2: Verification. Signed-up users (see US1) have the option to submit a photo of themself doing certain poses, and users can submit a photo of a government-issued ID. Once these steps are completed and pictures are verified, the user will be considered verified. There will be a checkmark next to their name. Verification makes a profile more likely to be seen by potential matches (THIS IS NOT A REQUIRED STEP).
+        US1.2.1: Failure of step. Get a notification on the app stating the failure of verification (and reason), and an option is given to retry.

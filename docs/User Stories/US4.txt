@@ -1,1 +1,21 @@
+Updated User Story:
+US4: Interaction with a match. Logged in user (see US2) sees a match (US3) with another user profile based on similarity. The logged in user can see the full profile information of the other user after they are matched. The user can view the other user profile’s full top artists list . This lets them see all their top artists and favorite songs rather than just a percentage of similarity. They will have access to each other’s email info so they can start contact if they so choose. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+OLD: 
 US4: Interaction with a match. Logged in user (see US2) gets a match (US3.1) with another user profile based on similarity. Both users can see the full profile information of the other user after they are matched. This might be additional pictures of the other user, or if they entered their last name, that will also be visible. The user can view the other user profile’s Spotify summary (similar to their Spotify wrapped). This lets them see their top artist and favorite songs rather than just a percentage of similarity. All matches can be found in the matches section and can lead to chatting. Both users will have the option to initiate the conversation with each other. This is a basic chat feature that has the added benefit of suggesting a first date (see US5). 
