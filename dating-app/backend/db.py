@@ -9,6 +9,10 @@ from .config import *
 
 
 def get_db():
+    ''' use this function to get a connection
+        to the database when making updates
+        inserts, or anything that requires 
+        a commit '''
     
     if 'db' not in g:
         g.db = sqlite3.connect(
@@ -21,6 +25,9 @@ def get_db():
 
 
 def close_db(e=None):
+    ''' close the database connection
+        by popping it off the stack
+        to close it '''
     db = g.pop('db', None)
 
     if db is not None:
@@ -44,16 +51,3 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
-
-
-# def init_db():
-#     db = get_db()
-#     with app.open_resource('schema.sql', mode='r') as f:
-#         db.cursor().executescript(f.read())
-#     db.commit()
-
-# @app.cli.command('initdb')
-# def initdb_command():
-#     """Initializes the database."""
-#     init_db()
-#     print('Initialized the database.')

@@ -8,8 +8,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-# init SQLAlchemy so we can use it later in our models
+# init SQLAlchemy so we can use it later in our models and set up the db 
 db = SQLAlchemy()
+
+#set up the app variable to be imported into all other files for later use 
 app = Flask(__name__)
 
 
@@ -21,23 +23,3 @@ def create_app():
     db.init_app(app)
 
     return app
-
-
-# app = Flask(__name__)
-# app.config.from_object(Config)
-# # db = SQLAlchemy(app)
-# # #migrate = Migrate(app, db)
-
-# # migrate = Migrate()
-# # migrate.init_app(app, db)
-
-
-# def create_app():
-
-#     from . import db
-#     db.init_app(app)
-
-#     return app
-
-
-# #from .app import models #removed routes
