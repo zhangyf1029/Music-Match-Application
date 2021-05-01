@@ -301,8 +301,8 @@ def update_profile():
 
 @app.route('/logout')
 def logout():
-    ''' nonfunctional path for /logout'''
-    return 'Logout'
+    ''' path for /logout'''
+    return render_template('logout.html')
 
 
 @app.route('/getAllUsers', methods=['GET'])
